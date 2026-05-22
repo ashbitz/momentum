@@ -1,9 +1,12 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { useRouter } from 'expo-router';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { colors, radius, spacing } from '@/constants/theme';
 import { useMomentumStore } from '@/store/useMomentumStore';
 
 export default function HomeScreen() {
+  const router = useRouter();
+
   const habits = useMomentumStore((state) => state.habits);
   const tasks = useMomentumStore((state) => state.tasks);
   const notes = useMomentumStore((state) => state.notes);
@@ -22,6 +25,15 @@ export default function HomeScreen() {
       <Text style={styles.description}>
         Consulta de un vistazo tus hábitos, tareas y notas personales.
       </Text>
+
+      <Pressable
+        style={styles.createButton}
+        onPress={() => {
+          router.push('/new-item');
+        }}
+      >
+        <Text style={styles.createButtonText}>+ Crear nuevo</Text>
+      </Pressable>
 
       <View style={styles.statsGrid}>
         <View style={styles.statCard}>
@@ -79,6 +91,19 @@ const styles = StyleSheet.create({
     color: colors.dark.textMuted,
     fontSize: 16,
     lineHeight: 24,
+  },
+  createButton: {
+    alignSelf: 'flex-start',
+    marginTop: spacing.lg,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderRadius: radius.full,
+    backgroundColor: colors.brand.primary,
+  },
+  createButtonText: {
+    color: colors.dark.text,
+    fontSize: 15,
+    fontWeight: '700',
   },
   statsGrid: {
     flexDirection: 'row',
