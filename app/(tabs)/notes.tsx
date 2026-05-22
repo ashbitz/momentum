@@ -1,3 +1,4 @@
+import { FlashList } from '@shopify/flash-list';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { NoteCard } from '@/components/items/NoteCard';
@@ -14,10 +15,13 @@ export default function NotesScreen() {
         Guarda ideas rápidas, reflexiones o apuntes personales.
       </Text>
 
-      <View style={styles.list}>
-        {notes.map((note) => (
-          <NoteCard key={note.id} note={note} />
-        ))}
+      <View style={styles.listContainer}>
+        <FlashList
+          data={notes}
+          keyExtractor={(note) => note.id}
+          renderItem={({ item }) => <NoteCard note={item} />}
+          ItemSeparatorComponent={() => <View style={styles.separator} />}
+        />
       </View>
     </View>
   );
@@ -39,8 +43,11 @@ const styles = StyleSheet.create({
     color: colors.dark.textMuted,
     fontSize: 16,
   },
-  list: {
-    gap: spacing.md,
+  listContainer: {
+    flex: 1,
     marginTop: spacing.lg,
+  },
+  separator: {
+    height: spacing.md,
   },
 });

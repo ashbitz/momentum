@@ -1,3 +1,4 @@
+import { FlashList } from '@shopify/flash-list';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { TaskCard } from '@/components/items/TaskCard';
@@ -15,10 +16,15 @@ export default function TasksScreen() {
         Organiza tareas simples y checklists para tu día a día.
       </Text>
 
-      <View style={styles.list}>
-        {tasks.map((task) => (
-          <TaskCard key={task.id} task={task} onToggle={toggleTask} />
-        ))}
+      <View style={styles.listContainer}>
+        <FlashList
+          data={tasks}
+          keyExtractor={(task) => task.id}
+          renderItem={({ item }) => (
+            <TaskCard task={item} onToggle={toggleTask} />
+          )}
+          ItemSeparatorComponent={() => <View style={styles.separator} />}
+        />
       </View>
     </View>
   );
@@ -40,8 +46,11 @@ const styles = StyleSheet.create({
     color: colors.dark.textMuted,
     fontSize: 16,
   },
-  list: {
-    gap: spacing.md,
+  listContainer: {
+    flex: 1,
     marginTop: spacing.lg,
+  },
+  separator: {
+    height: spacing.md,
   },
 });

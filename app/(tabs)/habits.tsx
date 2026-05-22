@@ -1,3 +1,4 @@
+import { FlashList } from '@shopify/flash-list';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { HabitCard } from '@/components/items/HabitCard';
@@ -14,10 +15,13 @@ export default function HabitsScreen() {
         Seguimiento visual, rachas y progreso diario.
       </Text>
 
-      <View style={styles.list}>
-        {habits.map((habit) => (
-          <HabitCard key={habit.id} habit={habit} />
-        ))}
+      <View style={styles.listContainer}>
+        <FlashList
+          data={habits}
+          keyExtractor={(habit) => habit.id}
+          renderItem={({ item }) => <HabitCard habit={item} />}
+          ItemSeparatorComponent={() => <View style={styles.separator} />}
+        />
       </View>
     </View>
   );
@@ -39,8 +43,11 @@ const styles = StyleSheet.create({
     color: colors.dark.textMuted,
     fontSize: 16,
   },
-  list: {
-    gap: spacing.md,
+  listContainer: {
+    flex: 1,
     marginTop: spacing.lg,
+  },
+  separator: {
+    height: spacing.md,
   },
 });
