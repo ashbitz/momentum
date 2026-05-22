@@ -1,15 +1,58 @@
 import { StyleSheet, Text, View } from 'react-native';
 
-import { colors, spacing } from '@/constants/theme';
+import { colors, radius, spacing } from '@/constants/theme';
+import { useMomentumStore } from '@/store/useMomentumStore';
 
 export default function HomeScreen() {
+  const habits = useMomentumStore((state) => state.habits);
+  const tasks = useMomentumStore((state) => state.tasks);
+  const notes = useMomentumStore((state) => state.notes);
+
+  const pendingTasks = tasks.filter((task) => !task.isCompleted).length;
+  const completedTasks = tasks.filter((task) => task.isCompleted).length;
+  const trackedHabitDays = habits.reduce(
+    (total, habit) => total + habit.logs.length,
+    0,
+  );
+
   return (
     <View style={styles.container}>
       <Text style={styles.kicker}>Momentum</Text>
-      <Text style={styles.title}>Your daily progress, in one place.</Text>
+      <Text style={styles.title}>Resumen del día</Text>
       <Text style={styles.description}>
-        Track habits, review tasks and keep personal notes from your phone.
+        Consulta de un vistazo tus hábitos, tareas y notas personales.
       </Text>
+
+      <View style={styles.statsGrid}>
+        <View style={styles.statCard}>
+          <Text style={styles.statValue}>{habits.length}</Text>
+          <Text style={styles.statLabel}>hábitos activos</Text>
+        </View>
+
+        <View style={styles.statCard}>
+          <Text style={styles.statValue}>{pendingTasks}</Text>
+          <Text style={styles.statLabel}>tareas pendientes</Text>
+        </View>
+
+        <View style={styles.statCard}>
+          <Text style={styles.statValue}>{notes.length}</Text>
+          <Text style={styles.statLabel}>notas guardadas</Text>
+        </View>
+
+        <View style={styles.statCard}>
+          <Text style={styles.statValue}>{trackedHabitDays}</Text>
+          <Text style={styles.statLabel}>registros de hábitos</Text>
+        </View>
+      </View>
+
+      <View style={styles.summaryCard}>
+        <Text style={styles.summaryTitle}>Estado actual</Text>
+        <Text style={styles.summaryText}>
+          Has completado {completedTasks} tarea
+          {completedTasks === 1 ? '' : 's'} y tienes {pendingTasks} pendiente
+          {pendingTasks === 1 ? '' : 's'}.
+        </Text>
+      </View>
     </View>
   );
 }
@@ -17,7 +60,6 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
     padding: spacing.lg,
     backgroundColor: colors.dark.background,
   },
@@ -33,9 +75,53 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   description: {
-    marginTop: spacing.md,
+    marginTop: spacing.sm,
     color: colors.dark.textMuted,
     fontSize: 16,
     lineHeight: 24,
+  },
+  statsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.md,
+    marginTop: spacing.xl,
+  },
+  statCard: {
+    width: '47%',
+    padding: spacing.md,
+    borderWidth: 1,
+    borderColor: colors.dark.border,
+    borderRadius: radius.lg,
+    backgroundColor: colors.dark.surface,
+  },
+  statValue: {
+    color: colors.brand.accent,
+    fontSize: 28,
+    fontWeight: '700',
+  },
+  statLabel: {
+    marginTop: spacing.xs,
+    color: colors.dark.textMuted,
+    fontSize: 13,
+    lineHeight: 18,
+  },
+  summaryCard: {
+    marginTop: spacing.lg,
+    padding: spacing.md,
+    borderWidth: 1,
+    borderColor: colors.dark.border,
+    borderRadius: radius.lg,
+    backgroundColor: colors.dark.surfaceSoft,
+  },
+  summaryTitle: {
+    color: colors.dark.text,
+    fontSize: 18,
+    fontWeight: '700',
+  },
+  summaryText: {
+    marginTop: spacing.sm,
+    color: colors.dark.textMuted,
+    fontSize: 14,
+    lineHeight: 20,
   },
 });
