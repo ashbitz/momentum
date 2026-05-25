@@ -2,9 +2,9 @@
 
 ## 🔍 Organización del trabajo
 
-El desarrollo de Momentum se organiza mediante un tablero en Trello usando metodología Kanban.
+El desarrollo de Momentum se organiza mediante un tablero en Trello usando una estructura Kanban.
 
-La idea es dividir el proyecto en bloques pequeños para avanzar de forma ordenada, controlar qué está pendiente y evitar mezclar demasiadas tareas a la vez.
+La idea ha sido dividir el proyecto en bloques pequeños para avanzar de forma controlada y no mezclar demasiados cambios a la vez.
 
 ---
 
@@ -20,28 +20,26 @@ El tablero está dividido en las siguientes columnas:
 
 ---
 
-## 🧩 Tarjetas principales
+## 🧩 Bloques principales del proyecto
 
-Las tareas principales del proyecto se organizarán alrededor de las partes más importantes de la app:
+Las tareas principales se han organizado alrededor de las partes más importantes de la app:
 
-- Definir idea del proyecto.
-- Configurar proyecto Expo.
-- Configurar navegación con Expo Router.
-- Crear sistema de diseño.
-- Modelar datos con TypeScript.
-- Crear estado global con Zustand.
-- Implementar pantalla Home.
-- Implementar sección Habits.
-- Implementar sección Tasks.
-- Implementar sección Notes.
-- Crear tarjetas visuales para el contenido.
-- Implementar formularios con validación.
-- Añadir persistencia local.
-- Añadir pantallas de detalle.
-- Pulir UX, feedback táctil y estados vacíos.
-- Completar documentación técnica.
-
-Cada tarjeta podrá dividirse en subtareas técnicas más concretas según avance el desarrollo.
+- Definición de la idea.
+- Configuración del proyecto Expo.
+- Configuración de Expo Router.
+- Sistema de diseño base.
+- Modelado de datos con TypeScript.
+- Estado global con Zustand.
+- Pantallas principales.
+- Cards reutilizables.
+- Listas con FlashList.
+- Formularios con validación.
+- Persistencia local.
+- Rutas dinámicas y pantallas de detalle.
+- Eliminación con confirmación.
+- Haptics y estados vacíos.
+- Modo claro y oscuro.
+- Documentación técnica.
 
 ---
 
@@ -51,8 +49,35 @@ Cada tarjeta podrá dividirse en subtareas técnicas más concretas según avanc
 
 ---
 
-## 🚧 Estado inicial
+## ✅ Estado actual
 
-Actualmente el proyecto está en fase inicial.
+El proyecto tiene implementada la base funcional de la fase:
 
-Ya se ha definido la idea general de Momentum y se ha preparado la documentación base. El siguiente paso será configurar el proyecto Expo con TypeScript y empezar la estructura inicial de la app.
+- app Expo con TypeScript;
+- navegación por pestañas;
+- pantalla de creación;
+- hábitos, tareas y notas;
+- estado global con Zustand;
+- persistencia local con AsyncStorage;
+- listas con FlashList;
+- validación con Zod;
+- detalles con rutas dinámicas;
+- eliminación con confirmación;
+- haptics;
+- estados vacíos;
+- modo claro y oscuro;
+- documentación técnica.
+
+---
+
+## 🧪 Revisión final
+
+Antes de dar el proyecto por cerrado se revisa:
+
+- que `npx tsc --noEmit` no devuelva errores;
+- que la app funcione en Expo Go;
+- que se puedan crear los tres tipos de contenido;
+- que la persistencia local se mantenga al cerrar y abrir la app;
+- que las rutas de detalle funcionen;
+- que la eliminación pida confirmación;
+- que el cambio de tema funcione desde More.

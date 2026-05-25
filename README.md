@@ -9,7 +9,7 @@
 
 Momentum es una aplicación móvil de seguimiento personal para organizar hábitos, tareas y notas rápidas desde el móvil.
 
-La idea principal es ayudar al usuario a ver de forma visual cómo avanza en su día a día, especialmente mediante hábitos, rachas y registros por fecha.
+El objetivo es que el usuario pueda revisar su día de forma sencilla: ver hábitos activos, tareas pendientes, notas guardadas y acceder al detalle de cada elemento.
 
 Repositorio: https://github.com/ashbitz/momentum
 
@@ -17,30 +17,34 @@ Repositorio: https://github.com/ashbitz/momentum
 
 ## 📱 Descripción del proyecto
 
-Momentum combina tres partes principales:
+Momentum combina tres áreas principales:
 
-- **Habits** → seguimiento visual de hábitos con registros diarios.
-- **Tasks** → listas de tareas y checklists.
-- **Notes** → notas rápidas estilo bloc personal.
+- **Habits** → creación y consulta de hábitos con objetivo, unidad, color y registros.
+- **Tasks** → tareas sencillas que se pueden marcar como completadas o pendientes.
+- **Notes** → notas rápidas con título, contenido y color.
 
-Además, la app tendrá una pantalla **Home** con un resumen general y una sección **More** para ajustes, modo claro/oscuro y futuras opciones.
+La app también incluye una pantalla **Home** con resumen general y una sección **More** para ajustes básicos, como el cambio entre modo claro y oscuro.
 
-En esta primera versión, los datos se guardarán de forma local en el dispositivo.
+En esta fase los datos se guardan de forma local en el dispositivo, sin backend ni login.
 
 ---
 
-## ✨ Características principales
+## ✨ Características implementadas
 
-- Seguimiento de hábitos diarios.
-- Vista visual con cuadros por día e intensidad según el progreso.
-- Gestión de tareas tipo checklist.
-- Creación de notas rápidas.
-- Navegación por pestañas.
+- Navegación principal por pestañas con Expo Router.
+- Pantallas para Home, Habits, Tasks, Notes y More.
+- Creación de hábitos, tareas y notas desde un formulario común.
+- Validación de formularios con Zod.
 - Estado global con Zustand.
 - Persistencia local con AsyncStorage.
-- Validación de formularios.
-- Soporte para modo claro y modo oscuro.
-- Diseño móvil con una estética visual cuidada.
+- Listas renderizadas con FlashList.
+- Tarjetas reutilizables para hábitos, tareas y notas.
+- Pantallas de detalle mediante rutas dinámicas.
+- Eliminación con confirmación usando Alert.
+- Feedback táctil con Expo Haptics.
+- Estados vacíos en las listas.
+- Cambio funcional entre modo claro y modo oscuro.
+- Sistema de diseño base con tokens de color, espaciado y bordes.
 
 ---
 
@@ -48,34 +52,44 @@ En esta primera versión, los datos se guardarán de forma local en el dispositi
 
 ### Frontend / Mobile
 
-| Tecnología   | Uso                                         |
-| ------------ | ------------------------------------------- |
-| React Native | Desarrollo de la interfaz móvil             |
-| Expo         | Entorno de desarrollo y ejecución de la app |
-| TypeScript   | Tipado del proyecto                         |
-| Expo Router  | Navegación entre pantallas y pestañas       |
-| Gluestack UI | Sistema de componentes visuales             |
-| FlashList    | Renderizado eficiente de listas             |
-| Zustand      | Gestión de estado global                    |
-| AsyncStorage | Persistencia local en el dispositivo        |
-| Zod          | Validación de formularios                   |
+| Tecnología | Uso |
+| --- | --- |
+| React Native | Desarrollo de la interfaz móvil |
+| Expo | Entorno de desarrollo y ejecución de la app |
+| TypeScript | Tipado del proyecto |
+| Expo Router | Navegación por pestañas, stack y rutas dinámicas |
+| Gluestack UI | Provider y base para el sistema visual |
+| FlashList | Renderizado eficiente de listas |
+| Zustand | Gestión de estado global |
+| AsyncStorage | Persistencia local en el dispositivo |
+| Zod | Validación de formularios |
+| Expo Haptics | Feedback táctil en acciones |
+| NativeWind / Tailwind | Base de estilos generada por la configuración de Gluestack |
 
 ### Backend
 
-| Tecnología             | Uso                                                                           |
-| ---------------------- | ----------------------------------------------------------------------------- |
-| No aplica en esta fase | La primera versión funciona con estado local y persistencia en el dispositivo |
+| Tecnología | Uso |
+| --- | --- |
+| No aplica en esta fase | La app funciona con estado local y persistencia en el dispositivo |
 
 ---
 
-## 🧱 Estructura prevista del proyecto
+## 🧱 Estructura del proyecto
 
 ```txt
 momentum/
 ├── app/                    # Rutas y pantallas con Expo Router
+│   ├── (tabs)/             # Navegación principal por pestañas
+│   ├── habits/[id].tsx     # Detalle de hábito
+│   ├── tasks/[id].tsx      # Detalle de tarea
+│   ├── notes/[id].tsx      # Detalle de nota
+│   ├── _layout.tsx         # Layout raíz
+│   └── new-item.tsx        # Formulario de creación
 ├── components/             # Componentes reutilizables
 ├── constants/              # Tema, colores y valores base
+├── context/                # Contexto de tema claro/oscuro
 ├── docs/                   # Documentación del proyecto
+├── schemas/                # Validaciones con Zod
 ├── store/                  # Estado global con Zustand
 ├── types/                  # Tipos e interfaces de TypeScript
 ├── app.json                # Configuración de Expo
@@ -87,38 +101,70 @@ momentum/
 
 ## 📋 Gestión del proyecto
 
-El proyecto se organizará mediante un tablero Kanban en Trello.
+El proyecto se organiza mediante un tablero Kanban en Trello.
 
-Las tareas se dividirán en bloques pequeños para controlar mejor el avance: definición de la idea, configuración del proyecto, navegación, sistema de diseño, estado global, persistencia, formularios y pulido final.
+Las tareas se han dividido en bloques: definición de la idea, configuración del proyecto, navegación, sistema de diseño, estado global, formularios, persistencia local, detalles, feedback de usuario y documentación.
 
 👉 https://trello.com/b/cRvF6EyE/momentum
 
 ---
 
-## 🚧 Estado del proyecto
-
-Actualmente el proyecto está en fase inicial.
-
-Primeros objetivos:
-
-- Definir la idea general de Momentum.
-- Crear la documentación inicial.
-- Configurar el proyecto Expo con TypeScript.
-- Preparar la navegación principal con pestañas.
-- Definir los tipos principales de datos: hábitos, tareas y notas.
-
----
-
 ## ▶️ Ejecución en local
 
-Cuando el proyecto Expo esté configurado, se podrá ejecutar con:
+Instalar dependencias:
 
 ```bash
 npm install
+```
+
+Arrancar Expo:
+
+```bash
 npx expo start
 ```
 
-La app se podrá probar desde Expo Go, un emulador o un simulador.
+También se pueden usar los scripts del proyecto:
+
+```bash
+npm run start
+npm run android
+npm run ios
+npm run web
+```
+
+La prueba principal de esta fase se realiza desde **Expo Go** en móvil.
+
+---
+
+## ✅ Comprobación del proyecto
+
+Para comprobar TypeScript:
+
+```bash
+npx tsc --noEmit
+```
+
+Flujo básico de prueba:
+
+1. Abrir la app en Expo Go.
+2. Crear una tarea, una nota y un hábito.
+3. Comprobar que aparecen en sus pestañas.
+4. Entrar al detalle de cada elemento.
+5. Marcar una tarea como completada.
+6. Eliminar un elemento y confirmar que desaparece.
+7. Cerrar y abrir la app para comprobar la persistencia local.
+8. Cambiar entre modo claro y oscuro desde More.
+
+---
+
+## 📚 Documentación
+
+La documentación principal del proyecto está en:
+
+- `docs/idea.md`
+- `docs/project-management.md`
+- `docs/ai-setup.md`
+- `docs/react-native-teoria.md`
 
 ---
 
