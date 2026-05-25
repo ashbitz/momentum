@@ -1,3 +1,4 @@
+import { router } from 'expo-router';
 import { FlashList } from '@shopify/flash-list';
 import { StyleSheet, Text, View } from 'react-native';
 
@@ -21,7 +22,16 @@ export default function TasksScreen() {
           data={tasks}
           keyExtractor={(task) => task.id}
           renderItem={({ item }) => (
-            <TaskCard task={item} onToggle={toggleTask} />
+            <TaskCard
+              task={item}
+              onToggle={toggleTask}
+              onPress={() => {
+                router.push({
+                  pathname: '/tasks/[id]',
+                  params: { id: item.id },
+                });
+              }}
+            />
           )}
           ItemSeparatorComponent={() => <View style={styles.separator} />}
         />

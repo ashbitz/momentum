@@ -1,3 +1,4 @@
+import { router } from 'expo-router';
 import { FlashList } from '@shopify/flash-list';
 import { StyleSheet, Text, View } from 'react-native';
 
@@ -19,7 +20,17 @@ export default function NotesScreen() {
         <FlashList
           data={notes}
           keyExtractor={(note) => note.id}
-          renderItem={({ item }) => <NoteCard note={item} />}
+          renderItem={({ item }) => (
+            <NoteCard
+              note={item}
+              onPress={() => {
+                router.push({
+                  pathname: '/notes/[id]',
+                  params: { id: item.id },
+                });
+              }}
+            />
+          )}
           ItemSeparatorComponent={() => <View style={styles.separator} />}
         />
       </View>

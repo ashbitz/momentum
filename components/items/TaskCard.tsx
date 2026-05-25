@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { colors, radius, spacing } from '@/constants/theme';
 import type { Task } from '@/types';
@@ -6,11 +6,12 @@ import type { Task } from '@/types';
 interface TaskCardProps {
   task: Task;
   onToggle: (id: string) => void;
+  onPress?: () => void;
 }
 
-export function TaskCard({ task, onToggle }: TaskCardProps) {
+export function TaskCard({ task, onToggle, onPress }: TaskCardProps) {
   return (
-    <View style={styles.card}>
+    <Pressable style={styles.card} onPress={onPress}>
       <Text
         style={styles.checkbox}
         onPress={() => {
@@ -38,7 +39,7 @@ export function TaskCard({ task, onToggle }: TaskCardProps) {
           {task.isCompleted ? 'Completada' : 'Pendiente'}
         </Text>
       </View>
-    </View>
+    </Pressable>
   );
 }
 

@@ -1,15 +1,16 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { colors, radius, spacing } from '@/constants/theme';
 import type { Habit } from '@/types';
 
 interface HabitCardProps {
   habit: Habit;
+  onPress?: () => void;
 }
 
-export function HabitCard({ habit }: HabitCardProps) {
+export function HabitCard({ habit, onPress }: HabitCardProps) {
   return (
-    <View style={styles.card}>
+    <Pressable style={styles.card} onPress={onPress}>
       <View style={[styles.colorDot, { backgroundColor: habit.color }]} />
 
       <View style={styles.cardContent}>
@@ -23,11 +24,9 @@ export function HabitCard({ habit }: HabitCardProps) {
           Objetivo: {habit.targetValue} {habit.unit}
         </Text>
 
-        <Text style={styles.cardMeta}>
-          Registros: {habit.logs.length} días
-        </Text>
+        <Text style={styles.cardMeta}>Registros: {habit.logs.length} días</Text>
       </View>
-    </View>
+    </Pressable>
   );
 }
 

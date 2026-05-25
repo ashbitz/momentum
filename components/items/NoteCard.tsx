@@ -1,22 +1,23 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { colors, radius, spacing } from '@/constants/theme';
 import type { Note } from '@/types';
 
 interface NoteCardProps {
   note: Note;
+  onPress?: () => void;
 }
 
-export function NoteCard({ note }: NoteCardProps) {
+export function NoteCard({ note, onPress }: NoteCardProps) {
   return (
-    <View style={styles.card}>
+    <Pressable style={styles.card} onPress={onPress}>
       <View style={[styles.colorBar, { backgroundColor: note.color }]} />
 
       <View style={styles.cardContent}>
         <Text style={styles.cardTitle}>{note.title}</Text>
         <Text style={styles.cardDescription}>{note.content}</Text>
       </View>
-    </View>
+    </Pressable>
   );
 }
 

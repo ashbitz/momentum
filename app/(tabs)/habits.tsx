@@ -1,3 +1,4 @@
+import { router } from 'expo-router';
 import { FlashList } from '@shopify/flash-list';
 import { StyleSheet, Text, View } from 'react-native';
 
@@ -19,7 +20,17 @@ export default function HabitsScreen() {
         <FlashList
           data={habits}
           keyExtractor={(habit) => habit.id}
-          renderItem={({ item }) => <HabitCard habit={item} />}
+          renderItem={({ item }) => (
+            <HabitCard
+              habit={item}
+              onPress={() => {
+                router.push({
+                  pathname: '/habits/[id]',
+                  params: { id: item.id },
+                });
+              }}
+            />
+          )}
           ItemSeparatorComponent={() => <View style={styles.separator} />}
         />
       </View>
