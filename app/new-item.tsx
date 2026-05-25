@@ -13,6 +13,7 @@ import {
 import { z } from 'zod';
 
 import { colors, radius, spacing } from '@/constants/theme';
+import { useAppTheme } from '@/context/ThemeContext';
 import {
   habitSchema,
   noteSchema,
@@ -58,6 +59,7 @@ const habitColorOptions = [
 ];
 
 export default function NewItemScreen() {
+  const { colors: activeColors } = useAppTheme();
   const addHabit = useMomentumStore((state) => state.addHabit);
   const addTask = useMomentumStore((state) => state.addTask);
   const addNote = useMomentumStore((state) => state.addNote);
@@ -79,6 +81,26 @@ export default function NewItemScreen() {
   const [habitUnit, setHabitUnit] = useState('');
   const [habitColor, setHabitColor] = useState<string>(colors.habits.workout);
   const [habitErrors, setHabitErrors] = useState<HabitFormErrors>({});
+
+  const cardThemeStyle = {
+    borderColor: activeColors.border,
+    backgroundColor: activeColors.surface,
+  };
+  const inputThemeStyle = {
+    borderColor: activeColors.border,
+    backgroundColor: activeColors.background,
+    color: activeColors.text,
+  };
+  const optionThemeStyle = {
+    borderColor: activeColors.border,
+    backgroundColor: activeColors.background,
+  };
+  const optionSelectedThemeStyle = {
+    backgroundColor: activeColors.surfaceSoft,
+  };
+  const optionIndicatorThemeStyle = {
+    borderColor: activeColors.border,
+  };
 
   const buildBaseDates = () => {
     const now = new Date().toISOString();
@@ -212,21 +234,31 @@ export default function NewItemScreen() {
       <Stack.Screen options={{ presentation: 'modal', title: 'Nuevo elemento' }} />
 
       <KeyboardAvoidingView
-        style={styles.keyboardView}
+        style={[
+          styles.keyboardView,
+          { backgroundColor: activeColors.background },
+        ]}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
         <ScrollView
-          contentContainerStyle={styles.container}
+          contentContainerStyle={[
+            styles.container,
+            { backgroundColor: activeColors.background },
+          ]}
           keyboardShouldPersistTaps="handled"
         >
           <Text style={styles.kicker}>Crear</Text>
-          <Text style={styles.title}>Nuevo elemento</Text>
-          <Text style={styles.description}>
+          <Text style={[styles.title, { color: activeColors.text }]}>
+            Nuevo elemento
+          </Text>
+          <Text style={[styles.description, { color: activeColors.textMuted }]}>
             Elige qué quieres añadir a Momentum.
           </Text>
 
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>Tipo de elemento</Text>
+          <View style={[styles.card, cardThemeStyle]}>
+            <Text style={[styles.cardTitle, { color: activeColors.text }]}>
+              Tipo de elemento
+            </Text>
 
             <View style={styles.optionsContainer}>
               {itemTypeOptions.map((option) => {
@@ -238,12 +270,15 @@ export default function NewItemScreen() {
                     onPress={() => setSelectedType(option.value)}
                     style={[
                       styles.option,
+                      optionThemeStyle,
                       isSelected ? styles.optionSelected : null,
+                      isSelected ? optionSelectedThemeStyle : null,
                     ]}
                   >
                     <View
                       style={[
                         styles.optionIndicator,
+                        optionIndicatorThemeStyle,
                         isSelected ? styles.optionIndicatorSelected : null,
                       ]}
                     />
@@ -252,13 +287,19 @@ export default function NewItemScreen() {
                       <Text
                         style={[
                           styles.optionLabel,
+                          { color: activeColors.text },
                           isSelected ? styles.optionLabelSelected : null,
                         ]}
                       >
                         {option.label}
                       </Text>
 
-                      <Text style={styles.optionDescription}>
+                      <Text
+                        style={[
+                          styles.optionDescription,
+                          { color: activeColors.textMuted },
+                        ]}
+                      >
                         {option.description}
                       </Text>
                     </View>
@@ -269,11 +310,15 @@ export default function NewItemScreen() {
           </View>
 
           {selectedType === 'task' ? (
-            <View style={styles.card}>
-              <Text style={styles.cardTitle}>Datos de la tarea</Text>
+            <View style={[styles.card, cardThemeStyle]}>
+              <Text style={[styles.cardTitle, { color: activeColors.text }]}>
+                Datos de la tarea
+              </Text>
 
               <View style={styles.field}>
-                <Text style={styles.label}>Título</Text>
+                <Text style={[styles.label, { color: activeColors.text }]}>
+                  Título
+                </Text>
                 <TextInput
                   value={taskTitle}
                   onChangeText={(value) => {
@@ -284,9 +329,10 @@ export default function NewItemScreen() {
                     }));
                   }}
                   placeholder="Ej: Revisar documentación"
-                  placeholderTextColor={colors.dark.textMuted}
+                  placeholderTextColor={activeColors.textMuted}
                   style={[
                     styles.input,
+                    inputThemeStyle,
                     taskErrors.title ? styles.inputError : null,
                   ]}
                 />
@@ -296,7 +342,9 @@ export default function NewItemScreen() {
               </View>
 
               <View style={styles.field}>
-                <Text style={styles.label}>Descripción opcional</Text>
+                <Text style={[styles.label, { color: activeColors.text }]}>
+                  Descripción opcional
+                </Text>
                 <TextInput
                   value={taskDescription}
                   onChangeText={(value) => {
@@ -307,9 +355,9 @@ export default function NewItemScreen() {
                     }));
                   }}
                   placeholder="Ej: Añadir notas del último bloque"
-                  placeholderTextColor={colors.dark.textMuted}
+                  placeholderTextColor={activeColors.textMuted}
                   multiline
-                  style={[styles.input, styles.textArea]}
+                  style={[styles.input, inputThemeStyle, styles.textArea]}
                 />
                 {taskErrors.description ? (
                   <Text style={styles.errorText}>{taskErrors.description}</Text>
@@ -317,17 +365,28 @@ export default function NewItemScreen() {
               </View>
 
               <Pressable style={styles.primaryButton} onPress={handleCreateTask}>
-                <Text style={styles.primaryButtonText}>Crear tarea</Text>
+                <Text
+                  style={[
+                    styles.primaryButtonText,
+                    { color: activeColors.background },
+                  ]}
+                >
+                  Crear tarea
+                </Text>
               </Pressable>
             </View>
           ) : null}
 
           {selectedType === 'note' ? (
-            <View style={styles.card}>
-              <Text style={styles.cardTitle}>Datos de la nota</Text>
+            <View style={[styles.card, cardThemeStyle]}>
+              <Text style={[styles.cardTitle, { color: activeColors.text }]}>
+                Datos de la nota
+              </Text>
 
               <View style={styles.field}>
-                <Text style={styles.label}>Título</Text>
+                <Text style={[styles.label, { color: activeColors.text }]}>
+                  Título
+                </Text>
                 <TextInput
                   value={noteTitle}
                   onChangeText={(value) => {
@@ -338,9 +397,10 @@ export default function NewItemScreen() {
                     }));
                   }}
                   placeholder="Ej: Idea para mejorar la app"
-                  placeholderTextColor={colors.dark.textMuted}
+                  placeholderTextColor={activeColors.textMuted}
                   style={[
                     styles.input,
+                    inputThemeStyle,
                     noteErrors.title ? styles.inputError : null,
                   ]}
                 />
@@ -350,7 +410,9 @@ export default function NewItemScreen() {
               </View>
 
               <View style={styles.field}>
-                <Text style={styles.label}>Contenido</Text>
+                <Text style={[styles.label, { color: activeColors.text }]}>
+                  Contenido
+                </Text>
                 <TextInput
                   value={noteContent}
                   onChangeText={(value) => {
@@ -361,10 +423,11 @@ export default function NewItemScreen() {
                     }));
                   }}
                   placeholder="Escribe una nota rápida..."
-                  placeholderTextColor={colors.dark.textMuted}
+                  placeholderTextColor={activeColors.textMuted}
                   multiline
                   style={[
                     styles.input,
+                    inputThemeStyle,
                     styles.textArea,
                     noteErrors.content ? styles.inputError : null,
                   ]}
@@ -375,7 +438,9 @@ export default function NewItemScreen() {
               </View>
 
               <View style={styles.field}>
-                <Text style={styles.label}>Color</Text>
+                <Text style={[styles.label, { color: activeColors.text }]}>
+                  Color
+                </Text>
                 <View style={styles.colorOptions}>
                   {habitColorOptions.map((color) => {
                     const isSelected = noteColor === color;
@@ -388,6 +453,9 @@ export default function NewItemScreen() {
                           styles.colorOption,
                           { backgroundColor: color },
                           isSelected ? styles.colorOptionSelected : null,
+                          isSelected
+                            ? { borderColor: activeColors.text }
+                            : null,
                         ]}
                       />
                     );
@@ -396,17 +464,28 @@ export default function NewItemScreen() {
               </View>
 
               <Pressable style={styles.primaryButton} onPress={handleCreateNote}>
-                <Text style={styles.primaryButtonText}>Crear nota</Text>
+                <Text
+                  style={[
+                    styles.primaryButtonText,
+                    { color: activeColors.background },
+                  ]}
+                >
+                  Crear nota
+                </Text>
               </Pressable>
             </View>
           ) : null}
 
           {selectedType === 'habit' ? (
-            <View style={styles.card}>
-              <Text style={styles.cardTitle}>Datos del hábito</Text>
+            <View style={[styles.card, cardThemeStyle]}>
+              <Text style={[styles.cardTitle, { color: activeColors.text }]}>
+                Datos del hábito
+              </Text>
 
               <View style={styles.field}>
-                <Text style={styles.label}>Título</Text>
+                <Text style={[styles.label, { color: activeColors.text }]}>
+                  Título
+                </Text>
                 <TextInput
                   value={habitTitle}
                   onChangeText={(value) => {
@@ -417,9 +496,10 @@ export default function NewItemScreen() {
                     }));
                   }}
                   placeholder="Ej: Beber agua"
-                  placeholderTextColor={colors.dark.textMuted}
+                  placeholderTextColor={activeColors.textMuted}
                   style={[
                     styles.input,
+                    inputThemeStyle,
                     habitErrors.title ? styles.inputError : null,
                   ]}
                 />
@@ -429,7 +509,9 @@ export default function NewItemScreen() {
               </View>
 
               <View style={styles.field}>
-                <Text style={styles.label}>Descripción opcional</Text>
+                <Text style={[styles.label, { color: activeColors.text }]}>
+                  Descripción opcional
+                </Text>
                 <TextInput
                   value={habitDescription}
                   onChangeText={(value) => {
@@ -440,9 +522,9 @@ export default function NewItemScreen() {
                     }));
                   }}
                   placeholder="Ej: Registrar vasos de agua al día"
-                  placeholderTextColor={colors.dark.textMuted}
+                  placeholderTextColor={activeColors.textMuted}
                   multiline
-                  style={[styles.input, styles.textArea]}
+                  style={[styles.input, inputThemeStyle, styles.textArea]}
                 />
                 {habitErrors.description ? (
                   <Text style={styles.errorText}>{habitErrors.description}</Text>
@@ -451,7 +533,9 @@ export default function NewItemScreen() {
 
               <View style={styles.inlineFields}>
                 <View style={styles.inlineField}>
-                  <Text style={styles.label}>Objetivo</Text>
+                  <Text style={[styles.label, { color: activeColors.text }]}>
+                    Objetivo
+                  </Text>
                   <TextInput
                     value={habitTargetValue}
                     onChangeText={(value) => {
@@ -462,10 +546,11 @@ export default function NewItemScreen() {
                       }));
                     }}
                     placeholder="8"
-                    placeholderTextColor={colors.dark.textMuted}
+                    placeholderTextColor={activeColors.textMuted}
                     keyboardType="numeric"
                     style={[
                       styles.input,
+                      inputThemeStyle,
                       habitErrors.targetValue ? styles.inputError : null,
                     ]}
                   />
@@ -477,7 +562,9 @@ export default function NewItemScreen() {
                 </View>
 
                 <View style={styles.inlineField}>
-                  <Text style={styles.label}>Unidad</Text>
+                  <Text style={[styles.label, { color: activeColors.text }]}>
+                    Unidad
+                  </Text>
                   <TextInput
                     value={habitUnit}
                     onChangeText={(value) => {
@@ -488,9 +575,10 @@ export default function NewItemScreen() {
                       }));
                     }}
                     placeholder="vasos"
-                    placeholderTextColor={colors.dark.textMuted}
+                    placeholderTextColor={activeColors.textMuted}
                     style={[
                       styles.input,
+                      inputThemeStyle,
                       habitErrors.unit ? styles.inputError : null,
                     ]}
                   />
@@ -501,7 +589,9 @@ export default function NewItemScreen() {
               </View>
 
               <View style={styles.field}>
-                <Text style={styles.label}>Color</Text>
+                <Text style={[styles.label, { color: activeColors.text }]}>
+                  Color
+                </Text>
                 <View style={styles.colorOptions}>
                   {habitColorOptions.map((color) => {
                     const isSelected = habitColor === color;
@@ -514,6 +604,9 @@ export default function NewItemScreen() {
                           styles.colorOption,
                           { backgroundColor: color },
                           isSelected ? styles.colorOptionSelected : null,
+                          isSelected
+                            ? { borderColor: activeColors.text }
+                            : null,
                         ]}
                       />
                     );
@@ -522,7 +615,14 @@ export default function NewItemScreen() {
               </View>
 
               <Pressable style={styles.primaryButton} onPress={handleCreateHabit}>
-                <Text style={styles.primaryButtonText}>Crear hábito</Text>
+                <Text
+                  style={[
+                    styles.primaryButtonText,
+                    { color: activeColors.background },
+                  ]}
+                >
+                  Crear hábito
+                </Text>
               </Pressable>
             </View>
           ) : null}
@@ -535,12 +635,10 @@ export default function NewItemScreen() {
 const styles = StyleSheet.create({
   keyboardView: {
     flex: 1,
-    backgroundColor: colors.dark.background,
   },
   container: {
     flexGrow: 1,
     padding: spacing.lg,
-    backgroundColor: colors.dark.background,
   },
   kicker: {
     color: colors.brand.secondary,
@@ -549,13 +647,11 @@ const styles = StyleSheet.create({
   },
   title: {
     marginTop: spacing.sm,
-    color: colors.dark.text,
     fontSize: 32,
     fontWeight: '700',
   },
   description: {
     marginTop: spacing.sm,
-    color: colors.dark.textMuted,
     fontSize: 16,
     lineHeight: 24,
   },
@@ -563,12 +659,9 @@ const styles = StyleSheet.create({
     marginTop: spacing.xl,
     padding: spacing.md,
     borderWidth: 1,
-    borderColor: colors.dark.border,
     borderRadius: radius.lg,
-    backgroundColor: colors.dark.surface,
   },
   cardTitle: {
-    color: colors.dark.text,
     fontSize: 18,
     fontWeight: '700',
   },
@@ -582,19 +675,15 @@ const styles = StyleSheet.create({
     gap: spacing.md,
     padding: spacing.md,
     borderWidth: 1,
-    borderColor: colors.dark.border,
     borderRadius: radius.md,
-    backgroundColor: colors.dark.background,
   },
   optionSelected: {
     borderColor: colors.brand.primary,
-    backgroundColor: colors.dark.surfaceSoft,
   },
   optionIndicator: {
     width: 14,
     height: 14,
     borderWidth: 2,
-    borderColor: colors.dark.border,
     borderRadius: 999,
   },
   optionIndicatorSelected: {
@@ -605,7 +694,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   optionLabel: {
-    color: colors.dark.text,
     fontSize: 16,
     fontWeight: '700',
   },
@@ -614,7 +702,6 @@ const styles = StyleSheet.create({
   },
   optionDescription: {
     marginTop: 2,
-    color: colors.dark.textMuted,
     fontSize: 13,
     lineHeight: 18,
   },
@@ -623,7 +710,6 @@ const styles = StyleSheet.create({
   },
   label: {
     marginBottom: spacing.xs,
-    color: colors.dark.text,
     fontSize: 14,
     fontWeight: '600',
   },
@@ -632,10 +718,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     borderWidth: 1,
-    borderColor: colors.dark.border,
     borderRadius: radius.md,
-    backgroundColor: colors.dark.background,
-    color: colors.dark.text,
     fontSize: 16,
   },
   inputError: {
@@ -671,7 +754,6 @@ const styles = StyleSheet.create({
     borderRadius: 999,
   },
   colorOptionSelected: {
-    borderColor: colors.dark.text,
   },
   primaryButton: {
     alignItems: 'center',
@@ -681,7 +763,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.brand.primary,
   },
   primaryButtonText: {
-    color: colors.dark.background,
     fontSize: 16,
     fontWeight: '700',
   },

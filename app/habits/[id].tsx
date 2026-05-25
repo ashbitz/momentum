@@ -10,10 +10,12 @@ import {
 } from 'react-native';
 
 import { colors, radius, spacing } from '@/constants/theme';
+import { useAppTheme } from '@/context/ThemeContext';
 import { useMomentumStore } from '@/store/useMomentumStore';
 
 export default function HabitDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const { colors: activeColors } = useAppTheme();
 
   const habit = useMomentumStore((state) =>
     state.habits.find((currentHabit) => currentHabit.id === id),
@@ -51,17 +53,34 @@ export default function HabitDetailScreen() {
       <>
         <Stack.Screen options={{ title: 'Hábito' }} />
 
-        <View style={styles.container}>
-          <Text style={styles.title}>Hábito no encontrado</Text>
-          <Text style={styles.description}>
+        <View
+          style={[
+            styles.container,
+            { backgroundColor: activeColors.background },
+          ]}
+        >
+          <Text style={[styles.title, { color: activeColors.text }]}>
+            Hábito no encontrado
+          </Text>
+          <Text style={[styles.description, { color: activeColors.textMuted }]}>
             Este hábito no existe o ya ha sido eliminado.
           </Text>
 
           <Pressable
-            style={styles.secondaryButton}
+            style={[
+              styles.secondaryButton,
+              { backgroundColor: activeColors.surface },
+            ]}
             onPress={() => router.replace('/(tabs)/habits')}
           >
-            <Text style={styles.secondaryButtonText}>Volver a hábitos</Text>
+            <Text
+              style={[
+                styles.secondaryButtonText,
+                { color: activeColors.text },
+              ]}
+            >
+              Volver a hábitos
+            </Text>
           </Pressable>
         </View>
       </>
@@ -72,37 +91,80 @@ export default function HabitDetailScreen() {
     <>
       <Stack.Screen options={{ title: habit.title }} />
 
-      <ScrollView contentContainerStyle={styles.container}>
+      <ScrollView
+        contentContainerStyle={[
+          styles.container,
+          { backgroundColor: activeColors.background },
+        ]}
+      >
         <View style={styles.header}>
           <View style={[styles.colorDot, { backgroundColor: habit.color }]} />
-          <Text style={styles.title}>{habit.title}</Text>
+          <Text style={[styles.title, { color: activeColors.text }]}>
+            {habit.title}
+          </Text>
         </View>
 
         {habit.description ? (
-          <Text style={styles.description}>{habit.description}</Text>
+          <Text style={[styles.description, { color: activeColors.textMuted }]}>
+            {habit.description}
+          </Text>
         ) : null}
 
-        <View style={styles.card}>
-          <Text style={styles.cardLabel}>Objetivo diario</Text>
-          <Text style={styles.cardValue}>
+        <View
+          style={[
+            styles.card,
+            {
+              borderColor: activeColors.border,
+              backgroundColor: activeColors.surface,
+            },
+          ]}
+        >
+          <Text style={[styles.cardLabel, { color: activeColors.textMuted }]}>
+            Objetivo diario
+          </Text>
+          <Text style={[styles.cardValue, { color: activeColors.text }]}>
             {habit.targetValue} {habit.unit}
           </Text>
         </View>
 
-        <View style={styles.card}>
-          <Text style={styles.cardLabel}>Registros</Text>
-          <Text style={styles.cardValue}>{habit.logs.length} días</Text>
+        <View
+          style={[
+            styles.card,
+            {
+              borderColor: activeColors.border,
+              backgroundColor: activeColors.surface,
+            },
+          ]}
+        >
+          <Text style={[styles.cardLabel, { color: activeColors.textMuted }]}>
+            Registros
+          </Text>
+          <Text style={[styles.cardValue, { color: activeColors.text }]}>
+            {habit.logs.length} días
+          </Text>
         </View>
 
-        <View style={styles.card}>
-          <Text style={styles.cardLabel}>Creado</Text>
-          <Text style={styles.cardValue}>
+        <View
+          style={[
+            styles.card,
+            {
+              borderColor: activeColors.border,
+              backgroundColor: activeColors.surface,
+            },
+          ]}
+        >
+          <Text style={[styles.cardLabel, { color: activeColors.textMuted }]}>
+            Creado
+          </Text>
+          <Text style={[styles.cardValue, { color: activeColors.text }]}>
             {new Date(habit.createdAt).toLocaleDateString('es-ES')}
           </Text>
         </View>
 
         <Pressable style={styles.deleteButton} onPress={handleDelete}>
-          <Text style={styles.deleteButtonText}>Eliminar hábito</Text>
+          <Text style={[styles.deleteButtonText, { color: activeColors.text }]}>
+            Eliminar hábito
+          </Text>
         </Pressable>
       </ScrollView>
     </>
@@ -113,7 +175,6 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     padding: spacing.lg,
-    backgroundColor: colors.dark.background,
   },
   header: {
     flexDirection: 'row',
@@ -127,13 +188,11 @@ const styles = StyleSheet.create({
   },
   title: {
     flex: 1,
-    color: colors.dark.text,
     fontSize: 30,
     fontWeight: '700',
   },
   description: {
     marginTop: spacing.md,
-    color: colors.dark.textMuted,
     fontSize: 16,
     lineHeight: 24,
   },
@@ -141,18 +200,14 @@ const styles = StyleSheet.create({
     marginTop: spacing.md,
     padding: spacing.md,
     borderWidth: 1,
-    borderColor: colors.dark.border,
     borderRadius: radius.lg,
-    backgroundColor: colors.dark.surface,
   },
   cardLabel: {
-    color: colors.dark.textMuted,
     fontSize: 14,
     fontWeight: '600',
   },
   cardValue: {
     marginTop: spacing.xs,
-    color: colors.dark.text,
     fontSize: 18,
     fontWeight: '700',
   },
@@ -164,7 +219,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.feedback.error,
   },
   deleteButtonText: {
-    color: colors.dark.text,
     fontSize: 16,
     fontWeight: '700',
   },
@@ -173,10 +227,8 @@ const styles = StyleSheet.create({
     marginTop: spacing.lg,
     paddingVertical: spacing.md,
     borderRadius: radius.md,
-    backgroundColor: colors.dark.surface,
   },
   secondaryButtonText: {
-    color: colors.dark.text,
     fontSize: 16,
     fontWeight: '700',
   },

@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { colors, radius, spacing } from '@/constants/theme';
+import { radius, spacing } from '@/constants/theme';
+import { useAppTheme } from '@/context/ThemeContext';
 import type { Note } from '@/types';
 
 interface NoteCardProps {
@@ -9,13 +10,33 @@ interface NoteCardProps {
 }
 
 export function NoteCard({ note, onPress }: NoteCardProps) {
+  const { colors: activeColors } = useAppTheme();
+
   return (
-    <Pressable style={styles.card} onPress={onPress}>
+    <Pressable
+      style={[
+        styles.card,
+        {
+          borderColor: activeColors.border,
+          backgroundColor: activeColors.surface,
+        },
+      ]}
+      onPress={onPress}
+    >
       <View style={[styles.colorBar, { backgroundColor: note.color }]} />
 
       <View style={styles.cardContent}>
-        <Text style={styles.cardTitle}>{note.title}</Text>
-        <Text style={styles.cardDescription}>{note.content}</Text>
+        <Text style={[styles.cardTitle, { color: activeColors.text }]}>
+          {note.title}
+        </Text>
+        <Text
+          style={[
+            styles.cardDescription,
+            { color: activeColors.textMuted },
+          ]}
+        >
+          {note.content}
+        </Text>
       </View>
     </Pressable>
   );
@@ -25,9 +46,7 @@ const styles = StyleSheet.create({
   card: {
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: colors.dark.border,
     borderRadius: radius.lg,
-    backgroundColor: colors.dark.surface,
   },
   colorBar: {
     height: 5,
@@ -36,13 +55,11 @@ const styles = StyleSheet.create({
     padding: spacing.md,
   },
   cardTitle: {
-    color: colors.dark.text,
     fontSize: 18,
     fontWeight: '700',
   },
   cardDescription: {
     marginTop: spacing.xs,
-    color: colors.dark.textMuted,
     fontSize: 14,
     lineHeight: 20,
   },

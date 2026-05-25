@@ -4,10 +4,12 @@ import * as Haptics from 'expo-haptics';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { TaskCard } from '@/components/items/TaskCard';
-import { colors, spacing } from '@/constants/theme';
+import { spacing } from '@/constants/theme';
+import { useAppTheme } from '@/context/ThemeContext';
 import { useMomentumStore } from '@/store/useMomentumStore';
 
 export default function TasksScreen() {
+  const { colors: activeColors } = useAppTheme();
   const tasks = useMomentumStore((state) => state.tasks);
   const toggleTask = useMomentumStore((state) => state.toggleTask);
 
@@ -17,9 +19,14 @@ export default function TasksScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Tareas</Text>
-      <Text style={styles.description}>
+    <View
+      style={[
+        styles.container,
+        { backgroundColor: activeColors.background },
+      ]}
+    >
+      <Text style={[styles.title, { color: activeColors.text }]}>Tareas</Text>
+      <Text style={[styles.description, { color: activeColors.textMuted }]}>
         Organiza tareas simples y checklists para tu día a día.
       </Text>
 
@@ -41,9 +48,24 @@ export default function TasksScreen() {
           )}
           ItemSeparatorComponent={() => <View style={styles.separator} />}
           ListEmptyComponent={
-            <View style={styles.emptyContainer}>
-              <Text style={styles.emptyTitle}>No tienes tareas pendientes</Text>
-              <Text style={styles.emptyDescription}>
+            <View
+              style={[
+                styles.emptyContainer,
+                {
+                  borderColor: activeColors.border,
+                  backgroundColor: activeColors.surface,
+                },
+              ]}
+            >
+              <Text style={[styles.emptyTitle, { color: activeColors.text }]}>
+                No tienes tareas pendientes
+              </Text>
+              <Text
+                style={[
+                  styles.emptyDescription,
+                  { color: activeColors.textMuted },
+                ]}
+              >
                 Crea una nueva tarea para organizar lo próximo que quieras hacer.
               </Text>
             </View>
@@ -58,16 +80,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: spacing.lg,
-    backgroundColor: colors.dark.background,
   },
   title: {
-    color: colors.dark.text,
     fontSize: 28,
     fontWeight: '700',
   },
   description: {
     marginTop: spacing.sm,
-    color: colors.dark.textMuted,
     fontSize: 16,
   },
   listContainer: {
@@ -80,19 +99,15 @@ const styles = StyleSheet.create({
   emptyContainer: {
     padding: spacing.lg,
     borderWidth: 1,
-    borderColor: colors.dark.border,
     borderRadius: 16,
-    backgroundColor: colors.dark.surface,
   },
   emptyTitle: {
-    color: colors.dark.text,
     fontSize: 18,
     fontWeight: '700',
     textAlign: 'center',
   },
   emptyDescription: {
     marginTop: spacing.sm,
-    color: colors.dark.textMuted,
     fontSize: 14,
     lineHeight: 20,
     textAlign: 'center',

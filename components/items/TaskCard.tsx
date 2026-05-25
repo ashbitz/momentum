@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { colors, radius, spacing } from '@/constants/theme';
+import { useAppTheme } from '@/context/ThemeContext';
 import type { Task } from '@/types';
 
 interface TaskCardProps {
@@ -10,8 +11,19 @@ interface TaskCardProps {
 }
 
 export function TaskCard({ task, onToggle, onPress }: TaskCardProps) {
+  const { colors: activeColors } = useAppTheme();
+
   return (
-    <Pressable style={styles.card} onPress={onPress}>
+    <Pressable
+      style={[
+        styles.card,
+        {
+          borderColor: activeColors.border,
+          backgroundColor: activeColors.surface,
+        },
+      ]}
+      onPress={onPress}
+    >
       <Text
         style={styles.checkbox}
         onPress={() => {
@@ -25,17 +37,29 @@ export function TaskCard({ task, onToggle, onPress }: TaskCardProps) {
         <Text
           style={[
             styles.cardTitle,
-            task.isCompleted && styles.cardTitleCompleted,
+            {
+              color: task.isCompleted
+                ? activeColors.textMuted
+                : activeColors.text,
+            },
+            task.isCompleted ? styles.cardTitleCompleted : null,
           ]}
         >
           {task.title}
         </Text>
 
         {task.description ? (
-          <Text style={styles.cardDescription}>{task.description}</Text>
+          <Text
+            style={[
+              styles.cardDescription,
+              { color: activeColors.textMuted },
+            ]}
+          >
+            {task.description}
+          </Text>
         ) : null}
 
-        <Text style={styles.cardMeta}>
+        <Text style={[styles.cardMeta, { color: activeColors.textMuted }]}>
           {task.isCompleted ? 'Completada' : 'Pendiente'}
         </Text>
       </View>
@@ -49,9 +73,7 @@ const styles = StyleSheet.create({
     gap: spacing.md,
     padding: spacing.md,
     borderWidth: 1,
-    borderColor: colors.dark.border,
     borderRadius: radius.lg,
-    backgroundColor: colors.dark.surface,
   },
   checkbox: {
     width: 28,
@@ -64,23 +86,19 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   cardTitle: {
-    color: colors.dark.text,
     fontSize: 18,
     fontWeight: '700',
   },
   cardTitleCompleted: {
-    color: colors.dark.textMuted,
     textDecorationLine: 'line-through',
   },
   cardDescription: {
     marginTop: spacing.xs,
-    color: colors.dark.textMuted,
     fontSize: 14,
     lineHeight: 20,
   },
   cardMeta: {
     marginTop: spacing.sm,
-    color: colors.dark.textMuted,
     fontSize: 13,
   },
 });

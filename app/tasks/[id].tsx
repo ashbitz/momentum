@@ -10,10 +10,12 @@ import {
 } from 'react-native';
 
 import { colors, radius, spacing } from '@/constants/theme';
+import { useAppTheme } from '@/context/ThemeContext';
 import { useMomentumStore } from '@/store/useMomentumStore';
 
 export default function TaskDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const { colors: activeColors } = useAppTheme();
 
   const task = useMomentumStore((state) =>
     state.tasks.find((currentTask) => currentTask.id === id),
@@ -61,17 +63,34 @@ export default function TaskDetailScreen() {
       <>
         <Stack.Screen options={{ title: 'Tarea' }} />
 
-        <View style={styles.container}>
-          <Text style={styles.title}>Tarea no encontrada</Text>
-          <Text style={styles.description}>
+        <View
+          style={[
+            styles.container,
+            { backgroundColor: activeColors.background },
+          ]}
+        >
+          <Text style={[styles.title, { color: activeColors.text }]}>
+            Tarea no encontrada
+          </Text>
+          <Text style={[styles.description, { color: activeColors.textMuted }]}>
             Esta tarea no existe o ya ha sido eliminada.
           </Text>
 
           <Pressable
-            style={styles.secondaryButton}
+            style={[
+              styles.secondaryButton,
+              { backgroundColor: activeColors.surface },
+            ]}
             onPress={() => router.replace('/(tabs)/tasks')}
           >
-            <Text style={styles.secondaryButtonText}>Volver a tareas</Text>
+            <Text
+              style={[
+                styles.secondaryButtonText,
+                { color: activeColors.text },
+              ]}
+            >
+              Volver a tareas
+            </Text>
           </Pressable>
         </View>
       </>
@@ -82,35 +101,71 @@ export default function TaskDetailScreen() {
     <>
       <Stack.Screen options={{ title: task.title }} />
 
-      <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.title}>{task.title}</Text>
+      <ScrollView
+        contentContainerStyle={[
+          styles.container,
+          { backgroundColor: activeColors.background },
+        ]}
+      >
+        <Text style={[styles.title, { color: activeColors.text }]}>
+          {task.title}
+        </Text>
 
         {task.description ? (
-          <Text style={styles.description}>{task.description}</Text>
+          <Text style={[styles.description, { color: activeColors.textMuted }]}>
+            {task.description}
+          </Text>
         ) : null}
 
-        <View style={styles.card}>
-          <Text style={styles.cardLabel}>Estado</Text>
-          <Text style={styles.cardValue}>
+        <View
+          style={[
+            styles.card,
+            {
+              borderColor: activeColors.border,
+              backgroundColor: activeColors.surface,
+            },
+          ]}
+        >
+          <Text style={[styles.cardLabel, { color: activeColors.textMuted }]}>
+            Estado
+          </Text>
+          <Text style={[styles.cardValue, { color: activeColors.text }]}>
             {task.isCompleted ? 'Completada' : 'Pendiente'}
           </Text>
         </View>
 
-        <View style={styles.card}>
-          <Text style={styles.cardLabel}>Creada</Text>
-          <Text style={styles.cardValue}>
+        <View
+          style={[
+            styles.card,
+            {
+              borderColor: activeColors.border,
+              backgroundColor: activeColors.surface,
+            },
+          ]}
+        >
+          <Text style={[styles.cardLabel, { color: activeColors.textMuted }]}>
+            Creada
+          </Text>
+          <Text style={[styles.cardValue, { color: activeColors.text }]}>
             {new Date(task.createdAt).toLocaleDateString('es-ES')}
           </Text>
         </View>
 
         <Pressable style={styles.primaryButton} onPress={handleToggle}>
-          <Text style={styles.primaryButtonText}>
+          <Text
+            style={[
+              styles.primaryButtonText,
+              { color: activeColors.background },
+            ]}
+          >
             {task.isCompleted ? 'Marcar como pendiente' : 'Marcar como completada'}
           </Text>
         </Pressable>
 
         <Pressable style={styles.deleteButton} onPress={handleDelete}>
-          <Text style={styles.deleteButtonText}>Eliminar tarea</Text>
+          <Text style={[styles.deleteButtonText, { color: activeColors.text }]}>
+            Eliminar tarea
+          </Text>
         </Pressable>
       </ScrollView>
     </>
@@ -121,16 +176,13 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     padding: spacing.lg,
-    backgroundColor: colors.dark.background,
   },
   title: {
-    color: colors.dark.text,
     fontSize: 30,
     fontWeight: '700',
   },
   description: {
     marginTop: spacing.md,
-    color: colors.dark.textMuted,
     fontSize: 16,
     lineHeight: 24,
   },
@@ -138,18 +190,14 @@ const styles = StyleSheet.create({
     marginTop: spacing.md,
     padding: spacing.md,
     borderWidth: 1,
-    borderColor: colors.dark.border,
     borderRadius: radius.lg,
-    backgroundColor: colors.dark.surface,
   },
   cardLabel: {
-    color: colors.dark.textMuted,
     fontSize: 14,
     fontWeight: '600',
   },
   cardValue: {
     marginTop: spacing.xs,
-    color: colors.dark.text,
     fontSize: 18,
     fontWeight: '700',
   },
@@ -161,7 +209,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.brand.primary,
   },
   primaryButtonText: {
-    color: colors.dark.background,
     fontSize: 16,
     fontWeight: '700',
   },
@@ -173,7 +220,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.feedback.error,
   },
   deleteButtonText: {
-    color: colors.dark.text,
     fontSize: 16,
     fontWeight: '700',
   },
@@ -182,10 +228,8 @@ const styles = StyleSheet.create({
     marginTop: spacing.lg,
     paddingVertical: spacing.md,
     borderRadius: radius.md,
-    backgroundColor: colors.dark.surface,
   },
   secondaryButtonText: {
-    color: colors.dark.text,
     fontSize: 16,
     fontWeight: '700',
   },

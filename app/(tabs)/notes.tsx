@@ -3,16 +3,23 @@ import { FlashList } from '@shopify/flash-list';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { NoteCard } from '@/components/items/NoteCard';
-import { colors, spacing } from '@/constants/theme';
+import { spacing } from '@/constants/theme';
+import { useAppTheme } from '@/context/ThemeContext';
 import { useMomentumStore } from '@/store/useMomentumStore';
 
 export default function NotesScreen() {
+  const { colors: activeColors } = useAppTheme();
   const notes = useMomentumStore((state) => state.notes);
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Notas</Text>
-      <Text style={styles.description}>
+    <View
+      style={[
+        styles.container,
+        { backgroundColor: activeColors.background },
+      ]}
+    >
+      <Text style={[styles.title, { color: activeColors.text }]}>Notas</Text>
+      <Text style={[styles.description, { color: activeColors.textMuted }]}>
         Guarda ideas rápidas, reflexiones o apuntes personales.
       </Text>
 
@@ -33,9 +40,24 @@ export default function NotesScreen() {
           )}
           ItemSeparatorComponent={() => <View style={styles.separator} />}
           ListEmptyComponent={
-            <View style={styles.emptyContainer}>
-              <Text style={styles.emptyTitle}>Todavía no hay notas</Text>
-              <Text style={styles.emptyDescription}>
+            <View
+              style={[
+                styles.emptyContainer,
+                {
+                  borderColor: activeColors.border,
+                  backgroundColor: activeColors.surface,
+                },
+              ]}
+            >
+              <Text style={[styles.emptyTitle, { color: activeColors.text }]}>
+                Todavía no hay notas
+              </Text>
+              <Text
+                style={[
+                  styles.emptyDescription,
+                  { color: activeColors.textMuted },
+                ]}
+              >
                 Guarda una idea rápida, un recordatorio o cualquier apunte personal.
               </Text>
             </View>
@@ -50,16 +72,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: spacing.lg,
-    backgroundColor: colors.dark.background,
   },
   title: {
-    color: colors.dark.text,
     fontSize: 28,
     fontWeight: '700',
   },
   description: {
     marginTop: spacing.sm,
-    color: colors.dark.textMuted,
     fontSize: 16,
   },
   listContainer: {
@@ -72,19 +91,15 @@ const styles = StyleSheet.create({
   emptyContainer: {
     padding: spacing.lg,
     borderWidth: 1,
-    borderColor: colors.dark.border,
     borderRadius: 16,
-    backgroundColor: colors.dark.surface,
   },
   emptyTitle: {
-    color: colors.dark.text,
     fontSize: 18,
     fontWeight: '700',
     textAlign: 'center',
   },
   emptyDescription: {
     marginTop: spacing.sm,
-    color: colors.dark.textMuted,
     fontSize: 14,
     lineHeight: 20,
     textAlign: 'center',

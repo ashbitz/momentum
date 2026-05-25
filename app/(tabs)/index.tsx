@@ -2,10 +2,12 @@ import { useRouter } from 'expo-router';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { colors, radius, spacing } from '@/constants/theme';
+import { useAppTheme } from '@/context/ThemeContext';
 import { useMomentumStore } from '@/store/useMomentumStore';
 
 export default function HomeScreen() {
   const router = useRouter();
+  const { colors: activeColors } = useAppTheme();
 
   const habits = useMomentumStore((state) => state.habits);
   const tasks = useMomentumStore((state) => state.tasks);
@@ -19,10 +21,17 @@ export default function HomeScreen() {
   );
 
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        { backgroundColor: activeColors.background },
+      ]}
+    >
       <Text style={styles.kicker}>Momentum</Text>
-      <Text style={styles.title}>Resumen del día</Text>
-      <Text style={styles.description}>
+      <Text style={[styles.title, { color: activeColors.text }]}>
+        Resumen del día
+      </Text>
+      <Text style={[styles.description, { color: activeColors.textMuted }]}>
         Consulta de un vistazo tus hábitos, tareas y notas personales.
       </Text>
 
@@ -32,34 +41,86 @@ export default function HomeScreen() {
           router.push('/new-item');
         }}
       >
-        <Text style={styles.createButtonText}>+ Crear nuevo</Text>
+        <Text style={[styles.createButtonText, { color: activeColors.text }]}>
+          + Crear nuevo
+        </Text>
       </Pressable>
 
       <View style={styles.statsGrid}>
-        <View style={styles.statCard}>
+        <View
+          style={[
+            styles.statCard,
+            {
+              borderColor: activeColors.border,
+              backgroundColor: activeColors.surface,
+            },
+          ]}
+        >
           <Text style={styles.statValue}>{habits.length}</Text>
-          <Text style={styles.statLabel}>hábitos activos</Text>
+          <Text style={[styles.statLabel, { color: activeColors.textMuted }]}>
+            hábitos activos
+          </Text>
         </View>
 
-        <View style={styles.statCard}>
+        <View
+          style={[
+            styles.statCard,
+            {
+              borderColor: activeColors.border,
+              backgroundColor: activeColors.surface,
+            },
+          ]}
+        >
           <Text style={styles.statValue}>{pendingTasks}</Text>
-          <Text style={styles.statLabel}>tareas pendientes</Text>
+          <Text style={[styles.statLabel, { color: activeColors.textMuted }]}>
+            tareas pendientes
+          </Text>
         </View>
 
-        <View style={styles.statCard}>
+        <View
+          style={[
+            styles.statCard,
+            {
+              borderColor: activeColors.border,
+              backgroundColor: activeColors.surface,
+            },
+          ]}
+        >
           <Text style={styles.statValue}>{notes.length}</Text>
-          <Text style={styles.statLabel}>notas guardadas</Text>
+          <Text style={[styles.statLabel, { color: activeColors.textMuted }]}>
+            notas guardadas
+          </Text>
         </View>
 
-        <View style={styles.statCard}>
+        <View
+          style={[
+            styles.statCard,
+            {
+              borderColor: activeColors.border,
+              backgroundColor: activeColors.surface,
+            },
+          ]}
+        >
           <Text style={styles.statValue}>{trackedHabitDays}</Text>
-          <Text style={styles.statLabel}>registros de hábitos</Text>
+          <Text style={[styles.statLabel, { color: activeColors.textMuted }]}>
+            registros de hábitos
+          </Text>
         </View>
       </View>
 
-      <View style={styles.summaryCard}>
-        <Text style={styles.summaryTitle}>Estado actual</Text>
-        <Text style={styles.summaryText}>
+      <View
+        style={[
+          styles.summaryCard,
+          {
+            borderColor: activeColors.border,
+            backgroundColor: activeColors.surfaceSoft,
+          },
+        ]}
+      >
+        <Text style={[styles.summaryTitle, { color: activeColors.text }]}>
+          Estado actual
+        </Text>
+        <Text style={[styles.summaryText, { color: activeColors.textMuted }]}>
           Has completado {completedTasks} tarea
           {completedTasks === 1 ? '' : 's'} y tienes {pendingTasks} pendiente
           {pendingTasks === 1 ? '' : 's'}.
@@ -73,7 +134,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: spacing.lg,
-    backgroundColor: colors.dark.background,
   },
   kicker: {
     marginBottom: spacing.sm,
@@ -82,13 +142,11 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   title: {
-    color: colors.dark.text,
     fontSize: 32,
     fontWeight: '700',
   },
   description: {
     marginTop: spacing.sm,
-    color: colors.dark.textMuted,
     fontSize: 16,
     lineHeight: 24,
   },
@@ -101,7 +159,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.brand.primary,
   },
   createButtonText: {
-    color: colors.dark.text,
     fontSize: 15,
     fontWeight: '700',
   },
@@ -115,9 +172,7 @@ const styles = StyleSheet.create({
     width: '47%',
     padding: spacing.md,
     borderWidth: 1,
-    borderColor: colors.dark.border,
     borderRadius: radius.lg,
-    backgroundColor: colors.dark.surface,
   },
   statValue: {
     color: colors.brand.accent,
@@ -126,7 +181,6 @@ const styles = StyleSheet.create({
   },
   statLabel: {
     marginTop: spacing.xs,
-    color: colors.dark.textMuted,
     fontSize: 13,
     lineHeight: 18,
   },
@@ -134,18 +188,14 @@ const styles = StyleSheet.create({
     marginTop: spacing.lg,
     padding: spacing.md,
     borderWidth: 1,
-    borderColor: colors.dark.border,
     borderRadius: radius.lg,
-    backgroundColor: colors.dark.surfaceSoft,
   },
   summaryTitle: {
-    color: colors.dark.text,
     fontSize: 18,
     fontWeight: '700',
   },
   summaryText: {
     marginTop: spacing.sm,
-    color: colors.dark.textMuted,
     fontSize: 14,
     lineHeight: 20,
   },
