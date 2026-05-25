@@ -32,6 +32,14 @@ export default function HabitsScreen() {
             />
           )}
           ItemSeparatorComponent={() => <View style={styles.separator} />}
+          ListEmptyComponent={
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyTitle}>Aún no hay hábitos</Text>
+              <Text style={styles.emptyDescription}>
+                Crea tu primer hábito para empezar a registrar tu progreso diario.
+              </Text>
+            </View>
+          }
         />
       </View>
     </View>
@@ -60,5 +68,25 @@ const styles = StyleSheet.create({
   },
   separator: {
     height: spacing.md,
+  },
+  emptyContainer: {
+    padding: spacing.lg,
+    borderWidth: 1,
+    borderColor: colors.dark.border,
+    borderRadius: 16,
+    backgroundColor: colors.dark.surface,
+  },
+  emptyTitle: {
+    color: colors.dark.text,
+    fontSize: 18,
+    fontWeight: '700',
+    textAlign: 'center',
+  },
+  emptyDescription: {
+    marginTop: spacing.sm,
+    color: colors.dark.textMuted,
+    fontSize: 14,
+    lineHeight: 20,
+    textAlign: 'center',
   },
 });

@@ -1,5 +1,13 @@
 import { router, Stack, useLocalSearchParams } from 'expo-router';
-import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import * as Haptics from 'expo-haptics';
+import {
+  Alert,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 
 import { colors, radius, spacing } from '@/constants/theme';
 import { useMomentumStore } from '@/store/useMomentumStore';
@@ -29,6 +37,7 @@ export default function NoteDetailScreen() {
           text: 'Eliminar',
           style: 'destructive',
           onPress: () => {
+            void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             deleteNote(note.id);
             router.replace('/(tabs)/notes');
           },

@@ -1,5 +1,13 @@
 import { router, Stack, useLocalSearchParams } from 'expo-router';
-import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import * as Haptics from 'expo-haptics';
+import {
+  Alert,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 
 import { colors, radius, spacing } from '@/constants/theme';
 import { useMomentumStore } from '@/store/useMomentumStore';
@@ -12,6 +20,15 @@ export default function TaskDetailScreen() {
   );
   const deleteTask = useMomentumStore((state) => state.deleteTask);
   const toggleTask = useMomentumStore((state) => state.toggleTask);
+
+  const handleToggle = () => {
+    if (!task) {
+      return;
+    }
+
+    void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    toggleTask(task.id);
+  };
 
   const handleDelete = () => {
     if (!task) {
@@ -30,6 +47,7 @@ export default function TaskDetailScreen() {
           text: 'Eliminar',
           style: 'destructive',
           onPress: () => {
+            void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             deleteTask(task.id);
             router.replace('/(tabs)/tasks');
           },
@@ -85,12 +103,7 @@ export default function TaskDetailScreen() {
           </Text>
         </View>
 
-        <Pressable
-          style={styles.primaryButton}
-          onPress={() => {
-            toggleTask(task.id);
-          }}
-        >
+        <Pressable style={styles.primaryButton} onPress={handleToggle}>
           <Text style={styles.primaryButtonText}>
             {task.isCompleted ? 'Marcar como pendiente' : 'Marcar como completada'}
           </Text>
