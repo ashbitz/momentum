@@ -1,4 +1,6 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
+import { createJSONStorage, persist } from 'zustand/middleware';
 
 import { colors } from '@/constants/theme';
 import type { Habit, Note, Task } from '@/types';
@@ -120,51 +122,59 @@ interface MomentumStore {
   toggleTask: (id: string) => void;
 }
 
-export const useMomentumStore = create<MomentumStore>((set) => ({
-  habits: initialHabits,
-  tasks: initialTasks,
-  notes: initialNotes,
+export const useMomentumStore = create<MomentumStore>()(
+  persist(
+    (set) => ({
+      habits: initialHabits,
+      tasks: initialTasks,
+      notes: initialNotes,
 
-  addHabit: (habit) =>
-    set((state) => ({
-      habits: [...state.habits, habit],
-    })),
+      addHabit: (habit) =>
+        set((state) => ({
+          habits: [...state.habits, habit],
+        })),
 
-  addTask: (task) =>
-    set((state) => ({
-      tasks: [...state.tasks, task],
-    })),
+      addTask: (task) =>
+        set((state) => ({
+          tasks: [...state.tasks, task],
+        })),
 
-  addNote: (note) =>
-    set((state) => ({
-      notes: [...state.notes, note],
-    })),
+      addNote: (note) =>
+        set((state) => ({
+          notes: [...state.notes, note],
+        })),
 
-  deleteHabit: (id) =>
-    set((state) => ({
-      habits: state.habits.filter((habit) => habit.id !== id),
-    })),
+      deleteHabit: (id) =>
+        set((state) => ({
+          habits: state.habits.filter((habit) => habit.id !== id),
+        })),
 
-  deleteTask: (id) =>
-    set((state) => ({
-      tasks: state.tasks.filter((task) => task.id !== id),
-    })),
+      deleteTask: (id) =>
+        set((state) => ({
+          tasks: state.tasks.filter((task) => task.id !== id),
+        })),
 
-  deleteNote: (id) =>
-    set((state) => ({
-      notes: state.notes.filter((note) => note.id !== id),
-    })),
+      deleteNote: (id) =>
+        set((state) => ({
+          notes: state.notes.filter((note) => note.id !== id),
+        })),
 
-  toggleTask: (id) =>
-    set((state) => ({
-      tasks: state.tasks.map((task) =>
-        task.id === id
-          ? {
-              ...task,
-              isCompleted: !task.isCompleted,
-              updatedAt: new Date().toISOString(),
-            }
-          : task,
-      ),
-    })),
-}));
+      toggleTask: (id) =>
+        set((state) => ({
+          tasks: state.tasks.map((task) =>
+            task.id === id
+              ? {
+                  ...task,
+                  isCompleted: !task.isCompleted,
+                  updatedAt: new Date().toISOString(),
+                }
+              : task,
+          ),
+        })),
+    }),
+    {
+      name: 'momentum-storage',
+      storage: createJSONStorage(() => AsyncStorage),
+    },
+  ),
+);
