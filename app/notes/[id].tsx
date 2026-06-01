@@ -22,6 +22,16 @@ export default function NoteDetailScreen() {
   );
   const deleteNote = useMomentumStore((state) => state.deleteNote);
 
+  const handleConfirmDelete = async () => {
+    if (!note) {
+      return;
+    }
+
+    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    await deleteNote(note.id);
+    router.replace('/(tabs)/notes');
+  };
+
   const handleDelete = () => {
     if (!note) {
       return;
@@ -39,9 +49,7 @@ export default function NoteDetailScreen() {
           text: 'Eliminar',
           style: 'destructive',
           onPress: () => {
-            void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            deleteNote(note.id);
-            router.replace('/(tabs)/notes');
+            void handleConfirmDelete();
           },
         },
       ],

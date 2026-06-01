@@ -23,13 +23,23 @@ export default function TaskDetailScreen() {
   const deleteTask = useMomentumStore((state) => state.deleteTask);
   const toggleTask = useMomentumStore((state) => state.toggleTask);
 
-  const handleToggle = () => {
+  const handleToggle = async () => {
     if (!task) {
       return;
     }
 
-    void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    toggleTask(task.id);
+    await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    await toggleTask(task.id);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!task) {
+      return;
+    }
+
+    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    await deleteTask(task.id);
+    router.replace('/(tabs)/tasks');
   };
 
   const handleDelete = () => {
@@ -49,9 +59,7 @@ export default function TaskDetailScreen() {
           text: 'Eliminar',
           style: 'destructive',
           onPress: () => {
-            void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            deleteTask(task.id);
-            router.replace('/(tabs)/tasks');
+            void handleConfirmDelete();
           },
         },
       ],
@@ -151,7 +159,12 @@ export default function TaskDetailScreen() {
           </Text>
         </View>
 
-        <Pressable style={styles.primaryButton} onPress={handleToggle}>
+        <Pressable
+          style={styles.primaryButton}
+          onPress={() => {
+            void handleToggle();
+          }}
+        >
           <Text
             style={[
               styles.primaryButtonText,

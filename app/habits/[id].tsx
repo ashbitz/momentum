@@ -22,6 +22,16 @@ export default function HabitDetailScreen() {
   );
   const deleteHabit = useMomentumStore((state) => state.deleteHabit);
 
+  const handleConfirmDelete = async () => {
+    if (!habit) {
+      return;
+    }
+
+    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    await deleteHabit(habit.id);
+    router.replace('/(tabs)/habits');
+  };
+
   const handleDelete = () => {
     if (!habit) {
       return;
@@ -39,9 +49,7 @@ export default function HabitDetailScreen() {
           text: 'Eliminar',
           style: 'destructive',
           onPress: () => {
-            void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            deleteHabit(habit.id);
-            router.replace('/(tabs)/habits');
+            void handleConfirmDelete();
           },
         },
       ],
