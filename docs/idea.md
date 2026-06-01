@@ -14,14 +14,15 @@ La app se organiza en cinco pestañas principales: Home, Habits, Tasks, Notes y 
 
 Muchas personas intentan crear rutinas, completar tareas o guardar ideas, pero acaban usando varias herramientas distintas: notas sueltas, recordatorios, listas separadas o apps demasiado complejas.
 
-Momentum intenta resolverlo con una app móvil sencilla, local y directa, donde el usuario pueda:
+Momentum intenta resolverlo con una app móvil sencilla y directa, donde el usuario pueda:
 
 - crear hábitos;
 - consultar su objetivo;
 - organizar tareas;
 - marcar tareas como completadas;
 - guardar notas rápidas;
-- revisar un resumen general.
+- revisar un resumen general;
+- mantener sus datos en una API propia conectada a la nube.
 
 ---
 
@@ -46,7 +47,7 @@ Por ejemplo:
 - entrar al detalle de un elemento;
 - eliminar contenido que ya no necesita.
 
-La app funciona de forma local en el dispositivo en esta primera versión, sin login ni backend.
+En esta fase la app se conecta a una API propia desplegada en Vercel. Los datos principales se guardan en PostgreSQL mediante Neon, por lo que la información puede mantenerse fuera del dispositivo.
 
 ---
 
@@ -62,7 +63,7 @@ Muestra el número de hábitos, tareas pendientes, notas guardadas y registros d
 
 Habits muestra los hábitos creados por el usuario.
 
-Cada hábito tiene título, descripción opcional, objetivo, unidad, color y registros.
+Cada hábito tiene título, descripción opcional, objetivo, unidad, color y registros. Los registros diarios se han preparado en el backend para poder representar el progreso visualmente más adelante.
 
 ### Tasks
 
@@ -86,7 +87,8 @@ En esta versión incluye el cambio entre modo claro y modo oscuro.
 
 - Crear hábitos, tareas y notas.
 - Validar formularios antes de guardar.
-- Guardar datos localmente en el dispositivo.
+- Consultar datos desde una API REST propia.
+- Guardar hábitos, tareas y notas en PostgreSQL mediante Neon.
 - Consultar listados mediante pestañas.
 - Mostrar tarjetas reutilizables.
 - Ver detalles con rutas dinámicas.
@@ -103,8 +105,9 @@ En esta versión incluye el cambio entre modo claro y modo oscuro.
 - Mejorar la parte visual de hábitos con un calendario de actividad.
 - Añadir rachas y estadísticas más completas.
 - Crear filtros por fecha, tipo o estado.
-- Permitir edición de elementos.
+- Permitir edición más completa de elementos.
 - Añadir archivado en lugar de eliminar siempre.
 - Añadir recordatorios o notificaciones.
 - Mejorar el diseño visual siguiendo una estética más premium.
-- Preparar autenticación y sincronización en la nube.
+- Añadir autenticación para separar datos por usuario.
+- Preparar una APK para instalar la app fuera del entorno de desarrollo.

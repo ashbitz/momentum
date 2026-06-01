@@ -34,7 +34,9 @@ Las tareas principales se han organizado alrededor de las partes más importante
 - Cards reutilizables.
 - Listas con FlashList.
 - Formularios con validación.
-- Persistencia local.
+- Backend propio con API REST.
+- Base de datos PostgreSQL en Neon.
+- Integración de la app móvil con la API.
 - Rutas dinámicas y pantallas de detalle.
 - Eliminación con confirmación.
 - Haptics y estados vacíos.
@@ -51,14 +53,18 @@ Las tareas principales se han organizado alrededor de las partes más importante
 
 ## ✅ Estado actual
 
-El proyecto tiene implementada la base funcional de la fase:
+El proyecto tiene implementada una base funcional con app móvil y backend propio:
 
 - app Expo con TypeScript;
 - navegación por pestañas;
 - pantalla de creación;
 - hábitos, tareas y notas;
 - estado global con Zustand;
-- persistencia local con AsyncStorage;
+- API REST propia desplegada en Vercel;
+- base de datos PostgreSQL en Neon;
+- conexión de la app móvil con la API;
+- creación, consulta y eliminación de elementos desde la API;
+- actualización del estado de tareas contra el backend;
 - listas con FlashList;
 - validación con Zod;
 - detalles con rutas dinámicas;
@@ -76,8 +82,11 @@ Antes de dar el proyecto por cerrado se revisa:
 
 - que `npx tsc --noEmit` no devuelva errores;
 - que la app funcione en Expo Go;
+- que Habits, Tasks y Notes carguen datos desde la API;
 - que se puedan crear los tres tipos de contenido;
-- que la persistencia local se mantenga al cerrar y abrir la app;
 - que las rutas de detalle funcionen;
-- que la eliminación pida confirmación;
-- que el cambio de tema funcione desde More.
+- que la eliminación pida confirmación y borre en el backend;
+- que las tareas puedan cambiar entre completadas y pendientes;
+- que los datos sigan disponibles al cerrar y abrir la app;
+- que el cambio de tema funcione desde More;
+- que la API desplegada responda correctamente.
