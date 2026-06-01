@@ -442,12 +442,12 @@ export default function NewItemScreen() {
                   Color
                 </Text>
                 <View style={styles.colorOptions}>
-                  {habitColorOptions.map((color) => {
+                  {habitColorOptions.map((color, index) => {
                     const isSelected = noteColor === color;
 
                     return (
                       <Pressable
-                        key={color}
+                        key={`${color}-${index}`}
                         onPress={() => setNoteColor(color)}
                         style={[
                           styles.colorOption,
@@ -593,12 +593,12 @@ export default function NewItemScreen() {
                   Color
                 </Text>
                 <View style={styles.colorOptions}>
-                  {habitColorOptions.map((color) => {
+                  {habitColorOptions.map((color, index) => {
                     const isSelected = habitColor === color;
 
                     return (
                       <Pressable
-                        key={color}
+                        key={`${color}-${index}`}
                         onPress={() => setHabitColor(color)}
                         style={[
                           styles.colorOption,

@@ -21,7 +21,7 @@ export default function MoreScreen() {
       <Text style={[styles.title, { color: activeColors.text }]}>Más</Text>
 
       <Text style={[styles.description, { color: activeColors.textMuted }]}>
-        Ajustes generales de Momentum y opciones preparadas para futuras mejoras.
+        Ajustes generales de Momentum.
       </Text>
 
       <View
@@ -59,26 +59,7 @@ export default function MoreScreen() {
           </Text>
         </Pressable>
       </View>
-
-      <View
-        style={[
-          styles.card,
-          {
-            borderColor: activeColors.border,
-            backgroundColor: activeColors.surface,
-          },
-        ]}
-      >
-        <Text style={[styles.cardTitle, { color: activeColors.text }]}>
-          Estado del proyecto
-        </Text>
-
-        <Text style={[styles.cardText, { color: activeColors.textMuted }]}>
-          La versión actual prioriza las funcionalidades principales del ejercicio:
-          creación, validación, persistencia local, navegación, detalle, haptics,
-          estados vacíos y eliminación de elementos.
-        </Text>
-      </View>
+    
     </View>
   );
 }

@@ -1,180 +1,247 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
-import { createJSONStorage, persist } from 'zustand/middleware';
 
-import { colors } from '@/constants/theme';
+import {
+  createHabit,
+  createNote,
+  createTask,
+  deleteHabit,
+  deleteNote,
+  deleteTask,
+  getHabits,
+  getNotes,
+  getTasks,
+  updateTaskStatus,
+} from '@/lib/api';
 import type { Habit, Note, Task } from '@/types';
-
-const now = new Date().toISOString();
-
-const initialHabits: Habit[] = [
-  {
-    id: 'habit-1',
-    title: 'Morning workout',
-    description: 'Short training session to start the day.',
-    color: colors.habits.workout,
-    targetValue: 1,
-    unit: 'session',
-    logs: [
-      { date: '2026-05-16', value: 1 },
-      { date: '2026-05-17', value: 1 },
-      { date: '2026-05-19', value: 1 },
-      { date: '2026-05-21', value: 1 },
-    ],
-    createdAt: now,
-    updatedAt: now,
-  },
-  {
-    id: 'habit-2',
-    title: 'Read 20 pages',
-    description: 'Daily reading habit.',
-    color: colors.habits.reading,
-    targetValue: 20,
-    unit: 'pages',
-    logs: [
-      { date: '2026-05-15', value: 12 },
-      { date: '2026-05-16', value: 20 },
-      { date: '2026-05-17', value: 24 },
-      { date: '2026-05-20', value: 15 },
-    ],
-    createdAt: now,
-    updatedAt: now,
-  },
-  {
-    id: 'habit-3',
-    title: 'Drink water',
-    description: 'Track glasses of water during the day.',
-    color: colors.habits.water,
-    targetValue: 8,
-    unit: 'glasses',
-    logs: [
-      { date: '2026-05-18', value: 5 },
-      { date: '2026-05-19', value: 7 },
-      { date: '2026-05-20', value: 8 },
-      { date: '2026-05-21', value: 6 },
-    ],
-    createdAt: now,
-    updatedAt: now,
-  },
-];
-
-const initialTasks: Task[] = [
-  {
-    id: 'task-1',
-    title: 'Prepare Expo Router structure',
-    description: 'Check that the main tabs are working.',
-    isCompleted: true,
-    createdAt: now,
-    updatedAt: now,
-  },
-  {
-    id: 'task-2',
-    title: 'Design habit cards',
-    description: 'Create the first visual version of habit cards.',
-    isCompleted: false,
-    createdAt: now,
-    updatedAt: now,
-  },
-  {
-    id: 'task-3',
-    title: 'Review project documentation',
-    description: 'Keep README and docs aligned with the current project.',
-    isCompleted: false,
-    createdAt: now,
-    updatedAt: now,
-  },
-];
-
-const initialNotes: Note[] = [
-  {
-    id: 'note-1',
-    title: 'App idea',
-    content:
-      'Momentum should feel visual, simple and focused on personal progress.',
-    color: colors.brand.primary,
-    createdAt: now,
-    updatedAt: now,
-  },
-  {
-    id: 'note-2',
-    title: 'Future feature',
-    content:
-      'Camera or GPS could be useful later for activity logs or habit evidence.',
-    color: colors.brand.secondary,
-    createdAt: now,
-    updatedAt: now,
-  },
-];
 
 interface MomentumStore {
   habits: Habit[];
   tasks: Task[];
   notes: Note[];
+  isLoading: boolean;
+  error: string | null;
 
-  addHabit: (habit: Habit) => void;
-  addTask: (task: Task) => void;
-  addNote: (note: Note) => void;
+  fetchHabits: () => Promise<void>;
+  fetchTasks: () => Promise<void>;
+  fetchNotes: () => Promise<void>;
 
-  deleteHabit: (id: string) => void;
-  deleteTask: (id: string) => void;
-  deleteNote: (id: string) => void;
+  addHabit: (habit: Habit) => Promise<void>;
+  addTask: (task: Task) => Promise<void>;
+  addNote: (note: Note) => Promise<void>;
 
-  toggleTask: (id: string) => void;
+  deleteHabit: (id: string) => Promise<void>;
+  deleteTask: (id: string) => Promise<void>;
+  deleteNote: (id: string) => Promise<void>;
+
+  toggleTask: (id: string) => Promise<void>;
 }
 
-export const useMomentumStore = create<MomentumStore>()(
-  persist(
-    (set) => ({
-      habits: initialHabits,
-      tasks: initialTasks,
-      notes: initialNotes,
+export const useMomentumStore = create<MomentumStore>()((set, get) => ({
+  habits: [],
+  tasks: [],
+  notes: [],
+  isLoading: false,
+  error: null,
 
-      addHabit: (habit) =>
-        set((state) => ({
-          habits: [...state.habits, habit],
-        })),
+  fetchHabits: async () => {
+    set({ isLoading: true, error: null });
 
-      addTask: (task) =>
-        set((state) => ({
-          tasks: [...state.tasks, task],
-        })),
+    try {
+      const habits = await getHabits();
 
-      addNote: (note) =>
-        set((state) => ({
-          notes: [...state.notes, note],
-        })),
+      set({
+        habits,
+        isLoading: false,
+      });
+    } catch {
+      set({
+        error: 'No se han podido cargar los hábitos.',
+        isLoading: false,
+      });
+    }
+  },
 
-      deleteHabit: (id) =>
-        set((state) => ({
-          habits: state.habits.filter((habit) => habit.id !== id),
-        })),
+  fetchTasks: async () => {
+    set({ isLoading: true, error: null });
 
-      deleteTask: (id) =>
-        set((state) => ({
-          tasks: state.tasks.filter((task) => task.id !== id),
-        })),
+    try {
+      const tasks = await getTasks();
 
-      deleteNote: (id) =>
-        set((state) => ({
-          notes: state.notes.filter((note) => note.id !== id),
-        })),
+      set({
+        tasks,
+        isLoading: false,
+      });
+    } catch {
+      set({
+        error: 'No se han podido cargar las tareas.',
+        isLoading: false,
+      });
+    }
+  },
 
-      toggleTask: (id) =>
-        set((state) => ({
-          tasks: state.tasks.map((task) =>
-            task.id === id
-              ? {
-                  ...task,
-                  isCompleted: !task.isCompleted,
-                  updatedAt: new Date().toISOString(),
-                }
-              : task,
-          ),
-        })),
-    }),
-    {
-      name: 'momentum-storage',
-      storage: createJSONStorage(() => AsyncStorage),
-    },
-  ),
-);
+  fetchNotes: async () => {
+    set({ isLoading: true, error: null });
+
+    try {
+      const notes = await getNotes();
+
+      set({
+        notes,
+        isLoading: false,
+      });
+    } catch {
+      set({
+        error: 'No se han podido cargar las notas.',
+        isLoading: false,
+      });
+    }
+  },
+
+  addHabit: async (habit) => {
+    set({ isLoading: true, error: null });
+
+    try {
+      const createdHabit = await createHabit({
+        title: habit.title,
+        description: habit.description,
+        color: habit.color,
+        targetValue: habit.targetValue,
+        unit: habit.unit,
+      });
+
+      set((state) => ({
+        habits: [...state.habits, createdHabit],
+        isLoading: false,
+      }));
+    } catch {
+      set({
+        error: 'No se ha podido crear el hábito.',
+        isLoading: false,
+      });
+    }
+  },
+
+  addTask: async (task) => {
+    set({ isLoading: true, error: null });
+
+    try {
+      const createdTask = await createTask({
+        title: task.title,
+        description: task.description,
+        isCompleted: task.isCompleted,
+      });
+
+      set((state) => ({
+        tasks: [...state.tasks, createdTask],
+        isLoading: false,
+      }));
+    } catch {
+      set({
+        error: 'No se ha podido crear la tarea.',
+        isLoading: false,
+      });
+    }
+  },
+
+  addNote: async (note) => {
+    set({ isLoading: true, error: null });
+
+    try {
+      const createdNote = await createNote({
+        title: note.title,
+        content: note.content,
+        color: note.color,
+      });
+
+      set((state) => ({
+        notes: [...state.notes, createdNote],
+        isLoading: false,
+      }));
+    } catch {
+      set({
+        error: 'No se ha podido crear la nota.',
+        isLoading: false,
+      });
+    }
+  },
+
+  deleteHabit: async (id) => {
+    set({ isLoading: true, error: null });
+
+    try {
+      await deleteHabit(id);
+
+      set((state) => ({
+        habits: state.habits.filter((habit) => habit.id !== id),
+        isLoading: false,
+      }));
+    } catch {
+      set({
+        error: 'No se ha podido eliminar el hábito.',
+        isLoading: false,
+      });
+    }
+  },
+
+  deleteTask: async (id) => {
+    set({ isLoading: true, error: null });
+
+    try {
+      await deleteTask(id);
+
+      set((state) => ({
+        tasks: state.tasks.filter((task) => task.id !== id),
+        isLoading: false,
+      }));
+    } catch {
+      set({
+        error: 'No se ha podido eliminar la tarea.',
+        isLoading: false,
+      });
+    }
+  },
+
+  deleteNote: async (id) => {
+    set({ isLoading: true, error: null });
+
+    try {
+      await deleteNote(id);
+
+      set((state) => ({
+        notes: state.notes.filter((note) => note.id !== id),
+        isLoading: false,
+      }));
+    } catch {
+      set({
+        error: 'No se ha podido eliminar la nota.',
+        isLoading: false,
+      });
+    }
+  },
+
+  toggleTask: async (id) => {
+    const task = get().tasks.find((currentTask) => currentTask.id === id);
+
+    if (!task) {
+      return;
+    }
+
+    set({ isLoading: true, error: null });
+
+    try {
+      const updatedTask = await updateTaskStatus(id, !task.isCompleted);
+
+      set((state) => ({
+        tasks: state.tasks.map((currentTask) =>
+          currentTask.id === id ? updatedTask : currentTask,
+        ),
+        isLoading: false,
+      }));
+    } catch {
+      set({
+        error: 'No se ha podido actualizar la tarea.',
+        isLoading: false,
+      });
+    }
+  },
+}));

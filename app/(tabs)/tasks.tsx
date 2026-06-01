@@ -1,7 +1,8 @@
+import { useEffect } from 'react';
 import { router } from 'expo-router';
 import { FlashList } from '@shopify/flash-list';
 import * as Haptics from 'expo-haptics';
-import { StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 
 import { TaskCard } from '@/components/items/TaskCard';
 import { spacing } from '@/constants/theme';
@@ -11,11 +12,18 @@ import { useMomentumStore } from '@/store/useMomentumStore';
 export default function TasksScreen() {
   const { colors: activeColors } = useAppTheme();
   const tasks = useMomentumStore((state) => state.tasks);
+  const isLoading = useMomentumStore((state) => state.isLoading);
+  const error = useMomentumStore((state) => state.error);
+  const fetchTasks = useMomentumStore((state) => state.fetchTasks);
   const toggleTask = useMomentumStore((state) => state.toggleTask);
+
+  useEffect(() => {
+    void fetchTasks();
+  }, [fetchTasks]);
 
   const handleToggleTask = (id: string) => {
     void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    toggleTask(id);
+    void toggleTask(id);
   };
 
   return (
@@ -30,48 +38,73 @@ export default function TasksScreen() {
         Organiza tareas simples y checklists para tu día a día.
       </Text>
 
-      <View style={styles.listContainer}>
-        <FlashList
-          data={tasks}
-          keyExtractor={(task) => task.id}
-          renderItem={({ item }) => (
-            <TaskCard
-              task={item}
-              onToggle={handleToggleTask}
-              onPress={() => {
-                router.push({
-                  pathname: '/tasks/[id]',
-                  params: { id: item.id },
-                });
-              }}
-            />
-          )}
-          ItemSeparatorComponent={() => <View style={styles.separator} />}
-          ListEmptyComponent={
-            <View
-              style={[
-                styles.emptyContainer,
-                {
-                  borderColor: activeColors.border,
-                  backgroundColor: activeColors.surface,
-                },
-              ]}
-            >
-              <Text style={[styles.emptyTitle, { color: activeColors.text }]}>
-                No tienes tareas pendientes
-              </Text>
-              <Text
+      {error ? (
+        <View
+          style={[
+            styles.feedbackContainer,
+            {
+              borderColor: activeColors.border,
+              backgroundColor: activeColors.surface,
+            },
+          ]}
+        >
+          <Text style={[styles.feedbackText, { color: activeColors.text }]}>
+            {error}
+          </Text>
+        </View>
+      ) : null}
+
+      {isLoading && tasks.length === 0 ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator />
+          <Text style={[styles.loadingText, { color: activeColors.textMuted }]}>
+            Cargando tareas...
+          </Text>
+        </View>
+      ) : (
+        <View style={styles.listContainer}>
+          <FlashList
+            data={tasks}
+            keyExtractor={(task) => task.id}
+            renderItem={({ item }) => (
+              <TaskCard
+                task={item}
+                onToggle={handleToggleTask}
+                onPress={() => {
+                  router.push({
+                    pathname: '/tasks/[id]',
+                    params: { id: item.id },
+                  });
+                }}
+              />
+            )}
+            ItemSeparatorComponent={() => <View style={styles.separator} />}
+            ListEmptyComponent={
+              <View
                 style={[
-                  styles.emptyDescription,
-                  { color: activeColors.textMuted },
+                  styles.emptyContainer,
+                  {
+                    borderColor: activeColors.border,
+                    backgroundColor: activeColors.surface,
+                  },
                 ]}
               >
-                Crea una nueva tarea para organizar lo próximo que quieras hacer.
-              </Text>
-            </View>
-          }
-        />
-      </View>
+                <Text style={[styles.emptyTitle, { color: activeColors.text }]}>
+                  No tienes tareas pendientes
+                </Text>
+                <Text
+                  style={[
+                    styles.emptyDescription,
+                    { color: activeColors.textMuted },
+                  ]}
+                >
+                  Crea una nueva tarea para organizar lo próximo que quieras hacer.
+                </Text>
+              </View>
+            }
+          />
+        </View>
+      )}
     </View>
   );
 }
@@ -88,6 +121,25 @@ const styles = StyleSheet.create({
   description: {
     marginTop: spacing.sm,
     fontSize: 16,
+  },
+  feedbackContainer: {
+    marginTop: spacing.md,
+    padding: spacing.md,
+    borderWidth: 1,
+    borderRadius: 16,
+  },
+  feedbackText: {
+    fontSize: 14,
+    textAlign: 'center',
+  },
+  loadingContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  loadingText: {
+    marginTop: spacing.sm,
+    fontSize: 14,
   },
   listContainer: {
     flex: 1,

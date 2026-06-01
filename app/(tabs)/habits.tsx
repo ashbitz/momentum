@@ -1,6 +1,7 @@
+import { useEffect } from 'react';
 import { router } from 'expo-router';
 import { FlashList } from '@shopify/flash-list';
-import { StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 
 import { HabitCard } from '@/components/items/HabitCard';
 import { spacing } from '@/constants/theme';
@@ -10,6 +11,13 @@ import { useMomentumStore } from '@/store/useMomentumStore';
 export default function HabitsScreen() {
   const { colors: activeColors } = useAppTheme();
   const habits = useMomentumStore((state) => state.habits);
+  const isLoading = useMomentumStore((state) => state.isLoading);
+  const error = useMomentumStore((state) => state.error);
+  const fetchHabits = useMomentumStore((state) => state.fetchHabits);
+
+  useEffect(() => {
+    void fetchHabits();
+  }, [fetchHabits]);
 
   return (
     <View
@@ -23,47 +31,72 @@ export default function HabitsScreen() {
         Seguimiento visual, rachas y progreso diario.
       </Text>
 
-      <View style={styles.listContainer}>
-        <FlashList
-          data={habits}
-          keyExtractor={(habit) => habit.id}
-          renderItem={({ item }) => (
-            <HabitCard
-              habit={item}
-              onPress={() => {
-                router.push({
-                  pathname: '/habits/[id]',
-                  params: { id: item.id },
-                });
-              }}
-            />
-          )}
-          ItemSeparatorComponent={() => <View style={styles.separator} />}
-          ListEmptyComponent={
-            <View
-              style={[
-                styles.emptyContainer,
-                {
-                  borderColor: activeColors.border,
-                  backgroundColor: activeColors.surface,
-                },
-              ]}
-            >
-              <Text style={[styles.emptyTitle, { color: activeColors.text }]}>
-                Aún no hay hábitos
-              </Text>
-              <Text
+      {error ? (
+        <View
+          style={[
+            styles.feedbackContainer,
+            {
+              borderColor: activeColors.border,
+              backgroundColor: activeColors.surface,
+            },
+          ]}
+        >
+          <Text style={[styles.feedbackText, { color: activeColors.text }]}>
+            {error}
+          </Text>
+        </View>
+      ) : null}
+
+      {isLoading && habits.length === 0 ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator />
+          <Text style={[styles.loadingText, { color: activeColors.textMuted }]}>
+            Cargando hábitos...
+          </Text>
+        </View>
+      ) : (
+        <View style={styles.listContainer}>
+          <FlashList
+            data={habits}
+            keyExtractor={(habit) => habit.id}
+            renderItem={({ item }) => (
+              <HabitCard
+                habit={item}
+                onPress={() => {
+                  router.push({
+                    pathname: '/habits/[id]',
+                    params: { id: item.id },
+                  });
+                }}
+              />
+            )}
+            ItemSeparatorComponent={() => <View style={styles.separator} />}
+            ListEmptyComponent={
+              <View
                 style={[
-                  styles.emptyDescription,
-                  { color: activeColors.textMuted },
+                  styles.emptyContainer,
+                  {
+                    borderColor: activeColors.border,
+                    backgroundColor: activeColors.surface,
+                  },
                 ]}
               >
-                Crea tu primer hábito para empezar a registrar tu progreso diario.
-              </Text>
-            </View>
-          }
-        />
-      </View>
+                <Text style={[styles.emptyTitle, { color: activeColors.text }]}>
+                  Aún no hay hábitos
+                </Text>
+                <Text
+                  style={[
+                    styles.emptyDescription,
+                    { color: activeColors.textMuted },
+                  ]}
+                >
+                  Crea tu primer hábito para empezar a registrar tu progreso diario.
+                </Text>
+              </View>
+            }
+          />
+        </View>
+      )}
     </View>
   );
 }
@@ -80,6 +113,25 @@ const styles = StyleSheet.create({
   description: {
     marginTop: spacing.sm,
     fontSize: 16,
+  },
+  feedbackContainer: {
+    marginTop: spacing.md,
+    padding: spacing.md,
+    borderWidth: 1,
+    borderRadius: 16,
+  },
+  feedbackText: {
+    fontSize: 14,
+    textAlign: 'center',
+  },
+  loadingContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  loadingText: {
+    marginTop: spacing.sm,
+    fontSize: 14,
   },
   listContainer: {
     flex: 1,
