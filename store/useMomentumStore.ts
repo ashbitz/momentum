@@ -132,7 +132,13 @@ export const useMomentumStore = create<MomentumStore>()((set, get) => ({
       });
 
       set((state) => ({
-        tasks: [...state.tasks, createdTask],
+        tasks: [
+          ...state.tasks,
+          {
+            ...createdTask,
+            color: task.color,
+          },
+        ],
         isLoading: false,
       }));
     } catch {
@@ -233,7 +239,12 @@ export const useMomentumStore = create<MomentumStore>()((set, get) => ({
 
       set((state) => ({
         tasks: state.tasks.map((currentTask) =>
-          currentTask.id === id ? updatedTask : currentTask,
+          currentTask.id === id
+            ? {
+                ...updatedTask,
+                color: currentTask.color,
+              }
+            : currentTask,
         ),
         isLoading: false,
       }));

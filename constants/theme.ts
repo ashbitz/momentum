@@ -1,40 +1,51 @@
 export const colors = {
   light: {
-    background: '#F7F8FA',
+    background: '#F4FBFA',
     surface: '#FFFFFF',
-    surfaceSoft: '#EEF1F6',
-    text: '#111827',
-    textMuted: '#6B7280',
-    border: '#E5E7EB',
+    surfaceSoft: '#E8F6F4',
+    text: '#10201F',
+    textMuted: '#647876',
+    border: '#D7E8E5',
   },
 
   dark: {
-    background: '#111827',
-    surface: '#1F2937',
-    surfaceSoft: '#273449',
-    text: '#F9FAFB',
-    textMuted: '#9CA3AF',
-    border: '#374151',
+    background: '#071A1F',
+    surface: '#0D2730',
+    surfaceSoft: '#143641',
+    text: '#F2FFFD',
+    textMuted: '#91AAA8',
+    border: '#1F4650',
   },
 
   brand: {
-    primary: '#7C5CFF',
+    primary: '#14B8A6',
     secondary: '#22D3EE',
-    accent: '#34D399',
+    accent: '#2DD4BF',
   },
 
   habits: {
-    workout: '#FF5C5C',
-    reading: '#7C5CFF',
-    water: '#22D3EE',
-    steps: '#34D399',
-    meditation: '#C084FC',
+    coral: '#FF5A4F',
+    orange: '#FF7A1A',
+    yellow: '#FACC15',
+    blue: '#2F80ED',
+    cyan: '#18C9D2',
+    momentum: '#14B8A6',
+    magenta: '#D946EF',
+
+    // Aliases used by the app UI.
+    workout: '#FF5A4F',
+    energy: '#FF7A1A',
+    steps: '#FACC15',
+    reading: '#2F80ED',
+    water: '#18C9D2',
+    meditation: '#D946EF',
   },
 
   feedback: {
     success: '#22C55E',
     warning: '#F59E0B',
     error: '#EF4444',
+    errorSoft: '#FDE7E4',
   },
 } as const;
 

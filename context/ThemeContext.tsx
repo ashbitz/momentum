@@ -24,7 +24,7 @@ const AppThemeContext = createContext<AppThemeContextValue | undefined>(
 );
 
 export function AppThemeProvider({ children }: PropsWithChildren) {
-  const [themeMode, setThemeMode] = useState<ThemeMode>('dark');
+  const [themeMode, setThemeMode] = useState<ThemeMode>('light');
 
   const toggleTheme = useCallback(() => {
     setThemeMode((currentMode) =>

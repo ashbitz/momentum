@@ -1,10 +1,10 @@
-# 📚 React Native, Expo y estado local
+# 📚 React Native, Expo y arquitectura móvil
 
 ## 🔍 Contexto del proyecto
 
 Momentum es una app móvil creada con React Native, Expo y TypeScript.
 
-La app permite gestionar tres tipos de contenido: hábitos, tareas y notas. Para esta fase se ha trabajado con estado local, navegación con Expo Router, listas eficientes, formularios validados y persistencia en el dispositivo.
+La app permite gestionar tres tipos de contenido: hábitos, tareas y notas. Actualmente usa una API propia desplegada en Vercel como fuente principal de datos, con Zustand para manejar el estado en la app y una capa `lib/api.ts` para comunicarse con el backend.
 
 ---
 
@@ -14,7 +14,7 @@ React Native permite crear interfaces móviles usando React, pero no funciona co
 
 Cuando se usa un componente como `View` o `Text`, React Native lo traduce a componentes nativos del sistema operativo. Por eso la app se comporta como una aplicación móvil real.
 
-La lógica de React se ejecuta en JavaScript, mientras que la interfaz se renderiza en la parte nativa. Si el hilo de JavaScript se bloquea con operaciones pesadas, la app puede perder fluidez. Por eso es importante cuidar el rendimiento, especialmente en listas largas.
+La lógica de React se ejecuta en JavaScript, mientras que la interfaz se renderiza en la parte nativa. Si el hilo de JavaScript se bloquea con operaciones pesadas, la app puede perder fluidez. Por eso es importante cuidar el rendimiento, especialmente en listas largas o pantallas con muchos elementos.
 
 ---
 
@@ -30,17 +30,19 @@ En Momentum se arranca con Expo:
 npx expo start
 ```
 
-Durante el desarrollo se ha probado principalmente desde Expo Go en móvil.
+Durante el desarrollo se prueba principalmente desde Expo Go en móvil.
 
 ---
 
-## 🚀 Expo Go y Development Build
+## 🚀 Expo Go, emulador y Development Build
 
 Expo Go permite probar la app rápidamente escaneando un QR, sin tener que compilar una aplicación nativa completa.
 
-Es muy útil para esta fase porque Momentum utiliza librerías compatibles con Expo Go, como Expo Router, AsyncStorage, FlashList, Zustand, Zod y Expo Haptics.
+Es útil para desarrollo porque Momentum usa librerías compatibles con Expo, como Expo Router, FlashList, Zustand, Zod y Expo Haptics.
 
-Un Development Build sería necesario si el proyecto necesitara módulos nativos personalizados o una configuración nativa más avanzada. Para esta versión no ha sido necesario.
+También se puede probar la app en un emulador de Android desde Android Studio. Esto permite revisar el comportamiento móvil desde el ordenador, aunque sigue siendo un entorno local de desarrollo.
+
+Un Development Build sería necesario si el proyecto necesitara módulos nativos personalizados o una configuración nativa más avanzada. Para esta versión no ha sido necesario, aunque más adelante la evolución natural del proyecto puede ser generar una APK.
 
 ---
 
@@ -78,7 +80,15 @@ app/tasks/[id].tsx
 app/notes/[id].tsx
 ```
 
-Las pestañas sirven para moverse entre secciones principales. Las rutas dinámicas sirven para abrir el detalle de un hábito, una tarea o una nota concreta. La pantalla `app/new-item.tsx` se usa para crear contenido nuevo.
+Las pestañas sirven para moverse entre secciones principales. Las rutas dinámicas sirven para abrir el detalle de un hábito, una tarea o una nota concreta. La pantalla `app/new-item.tsx` se usa para crear contenido nuevo desde un formulario común.
+
+En resumen:
+
+| Tipo de navegación | Uso en Momentum                                   |
+| ------------------ | ------------------------------------------------- |
+| Tabs               | Navegación principal entre secciones              |
+| Stack              | Navegación hacia detalles y pantallas secundarias |
+| Ruta de creación   | Pantalla para crear hábitos, tareas y notas       |
 
 ---
 
@@ -92,9 +102,9 @@ Los datos principales de Momentum se dividen en tres entidades:
 
 Todas comparten campos base como `id`, `title`, `createdAt` y `updatedAt`.
 
-En esta versión las fechas se guardan como texto ISO, porque los datos se persisten como JSON en AsyncStorage. Esto evita problemas al cerrar y volver a abrir la app.
+En la app móvil se usan tipos adaptados a la interfaz. La API devuelve algunos campos con formato de base de datos, como `created_at`, `is_completed` o `target`, y la capa `lib/api.ts` los transforma al formato que espera la app.
 
-TypeScript ayuda a controlar qué propiedades tiene cada tipo de elemento y reduce errores al crear, mostrar o eliminar datos.
+Esto evita que las pantallas tengan que conocer detalles internos del backend y mantiene el código de componentes más limpio.
 
 ---
 
@@ -113,9 +123,14 @@ Ahí se guardan:
 - `habits`
 - `tasks`
 - `notes`
+- `isLoading`
+- `error`
 
 Y también las acciones principales:
 
+- `fetchHabits`
+- `fetchTasks`
+- `fetchNotes`
 - `addHabit`
 - `addTask`
 - `addNote`
@@ -126,30 +141,42 @@ Y también las acciones principales:
 
 Se eligió Zustand porque es más ligero que montar un sistema grande con Context API y evita pasar props por muchas pantallas. Para este proyecto resulta suficiente, claro y fácil de mantener.
 
+Comparación rápida:
+
+| Opción      | Uso                                                   |
+| ----------- | ----------------------------------------------------- |
+| `useState`  | Estado pequeño dentro de un componente                |
+| Context API | Datos globales sencillos, como el tema visual         |
+| Zustand     | Estado global de la aplicación y acciones compartidas |
+
+En Momentum se usa Context para el tema claro/oscuro y Zustand para los datos principales de la app.
+
 ---
 
-## 💾 Persistencia con AsyncStorage
+## 🌐 Conexión con la API
 
-AsyncStorage permite guardar datos localmente en el dispositivo.
+Momentum consume una API propia desplegada en Vercel.
 
-En Momentum se usa junto al middleware `persist` de Zustand. Así, cuando el usuario crea o elimina contenido, el estado se guarda y puede recuperarse al volver a abrir la app.
-
-La configuración usa:
+La comunicación con el backend está centralizada en:
 
 ```txt
-persist
-createJSONStorage
-AsyncStorage
+lib/api.ts
 ```
 
-Limitaciones importantes:
+Este archivo contiene funciones para cargar, crear, actualizar o eliminar datos desde la API:
 
-- los datos se guardan solo en el dispositivo;
-- no hay sincronización entre móviles;
-- no es una base de datos remota;
-- no debe usarse para información sensible sin medidas adicionales.
+- hábitos;
+- tareas;
+- notas;
+- estado de tareas.
 
-Para esta fase encaja bien porque el ejercicio se centra en estado local.
+La app móvil no se conecta directamente a PostgreSQL. Solo llama a endpoints HTTP. El backend es quien valida los datos y guarda la información en Neon.
+
+Esta separación deja la arquitectura más ordenada:
+
+```txt
+App móvil → API REST → PostgreSQL / Neon
+```
 
 ---
 
@@ -186,7 +213,7 @@ No es imprescindible para la lógica de la app, pero mejora la sensación de int
 
 ---
 
-## 🧩 Estados vacíos
+## 🧩 Estados vacíos, carga y errores
 
 Las listas muestran un mensaje cuando no hay contenido.
 
@@ -197,6 +224,8 @@ Hay estados vacíos en:
 - Habits
 - Tasks
 - Notes
+
+Además, el store incluye `isLoading` y `error` para mostrar estados de carga o mensajes cuando la app no puede comunicarse correctamente con la API.
 
 ---
 
@@ -212,7 +241,7 @@ El cambio se aplica a pantallas principales, cards, detalles y formulario de cre
 
 ## 🧪 Comprobación final
 
-Para revisar el proyecto se usa:
+Para revisar TypeScript se usa:
 
 ```bash
 npx tsc --noEmit
@@ -221,11 +250,12 @@ npx tsc --noEmit
 También se comprueba en Expo Go:
 
 - navegación por pestañas;
+- carga de hábitos, tareas y notas desde la API;
 - creación de hábitos, tareas y notas;
 - validación de formularios;
-- persistencia local;
 - detalles mediante rutas dinámicas;
 - eliminación con confirmación;
 - estados vacíos;
 - cambio de tema;
-- feedback táctil.
+- feedback táctil;
+- conexión con la API desplegada.

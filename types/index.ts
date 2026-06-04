@@ -22,6 +22,7 @@ export interface Habit extends BaseItem {
 
 export interface Task extends BaseItem {
   description?: string;
+  color?: string;
   isCompleted: boolean;
 }
 

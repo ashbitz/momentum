@@ -30,7 +30,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="habits"
         options={{
-          title: 'Habits',
+          title: 'Hábitos',
           tabBarIcon: ({ color }) => <Text style={{ color }}>◼</Text>,
         }}
       />
@@ -38,7 +38,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="tasks"
         options={{
-          title: 'Tasks',
+          title: 'Tareas',
           tabBarIcon: ({ color }) => <Text style={{ color }}>✓</Text>,
         }}
       />
@@ -46,7 +46,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="notes"
         options={{
-          title: 'Notes',
+          title: 'Notas',
           tabBarIcon: ({ color }) => <Text style={{ color }}>✎</Text>,
         }}
       />
@@ -54,7 +54,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="more"
         options={{
-          title: 'More',
+          title: 'Más',
           tabBarIcon: ({ color }) => <Text style={{ color }}>•••</Text>,
         }}
       />

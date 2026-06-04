@@ -50,12 +50,14 @@ const itemTypeOptions: {
   },
 ];
 
-const habitColorOptions = [
-  colors.habits.workout,
-  colors.habits.reading,
-  colors.habits.water,
-  colors.brand.primary,
-  colors.brand.secondary,
+const colorOptions = [
+  colors.habits.coral,
+  colors.habits.orange,
+  colors.habits.yellow,
+  colors.habits.blue,
+  colors.habits.cyan,
+  colors.habits.momentum,
+  colors.habits.magenta,
 ];
 
 export default function NewItemScreen() {
@@ -68,6 +70,7 @@ export default function NewItemScreen() {
 
   const [taskTitle, setTaskTitle] = useState('');
   const [taskDescription, setTaskDescription] = useState('');
+  const [taskColor, setTaskColor] = useState<string>(colors.brand.primary);
   const [taskErrors, setTaskErrors] = useState<TaskFormErrors>({});
 
   const [noteTitle, setNoteTitle] = useState('');
@@ -79,7 +82,7 @@ export default function NewItemScreen() {
   const [habitDescription, setHabitDescription] = useState('');
   const [habitTargetValue, setHabitTargetValue] = useState('1');
   const [habitUnit, setHabitUnit] = useState('');
-  const [habitColor, setHabitColor] = useState<string>(colors.habits.workout);
+  const [habitColor, setHabitColor] = useState<string>(colors.habits.coral);
   const [habitErrors, setHabitErrors] = useState<HabitFormErrors>({});
 
   const cardThemeStyle = {
@@ -137,6 +140,7 @@ export default function NewItemScreen() {
       title: result.data.title,
       description: result.data.description,
       isCompleted: false,
+      color: taskColor,
       ...buildBaseDates(),
     };
 
@@ -364,6 +368,32 @@ export default function NewItemScreen() {
                 ) : null}
               </View>
 
+              <View style={styles.field}>
+                <Text style={[styles.label, { color: activeColors.text }]}>
+                  Color
+                </Text>
+                <View style={styles.colorOptions}>
+                  {colorOptions.map((color, index) => {
+                    const isSelected = taskColor === color;
+
+                    return (
+                      <Pressable
+                        key={`${color}-${index}`}
+                        onPress={() => setTaskColor(color)}
+                        style={[
+                          styles.colorOption,
+                          { backgroundColor: color },
+                          isSelected ? styles.colorOptionSelected : null,
+                          isSelected
+                            ? { borderColor: activeColors.text }
+                            : null,
+                        ]}
+                      />
+                    );
+                  })}
+                </View>
+              </View>
+
               <Pressable style={styles.primaryButton} onPress={handleCreateTask}>
                 <Text
                   style={[
@@ -442,7 +472,7 @@ export default function NewItemScreen() {
                   Color
                 </Text>
                 <View style={styles.colorOptions}>
-                  {habitColorOptions.map((color, index) => {
+                  {colorOptions.map((color, index) => {
                     const isSelected = noteColor === color;
 
                     return (
@@ -593,7 +623,7 @@ export default function NewItemScreen() {
                   Color
                 </Text>
                 <View style={styles.colorOptions}>
-                  {habitColorOptions.map((color, index) => {
+                  {colorOptions.map((color, index) => {
                     const isSelected = habitColor === color;
 
                     return (

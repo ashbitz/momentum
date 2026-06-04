@@ -9,6 +9,7 @@ import {
   View,
 } from 'react-native';
 
+import { ScreenContainer } from '@/components/layout/ScreenContainer';
 import { colors, radius, spacing } from '@/constants/theme';
 import { useAppTheme } from '@/context/ThemeContext';
 import { useMomentumStore } from '@/store/useMomentumStore';
@@ -59,142 +60,181 @@ export default function NoteDetailScreen() {
   if (!note) {
     return (
       <>
-        <Stack.Screen options={{ title: 'Nota' }} />
+        <Stack.Screen options={{ headerShown: false }} />
 
-        <View
-          style={[
-            styles.container,
-            { backgroundColor: activeColors.background },
-          ]}
-        >
-          <Text style={[styles.title, { color: activeColors.text }]}>
-            Nota no encontrada
-          </Text>
-          <Text style={[styles.description, { color: activeColors.textMuted }]}>
-            Esta nota no existe o ya ha sido eliminada.
-          </Text>
-
-          <Pressable
-            style={[
-              styles.secondaryButton,
-              { backgroundColor: activeColors.surface },
-            ]}
-            onPress={() => router.replace('/(tabs)/notes')}
-          >
-            <Text
-              style={[
-                styles.secondaryButtonText,
-                { color: activeColors.text },
-              ]}
-            >
-              Volver a notas
+        <ScreenContainer>
+          <View style={styles.emptyState}>
+            <Text style={[styles.title, { color: activeColors.text }]}>
+              Nota no encontrada
             </Text>
-          </Pressable>
-        </View>
+            <Text style={[styles.description, { color: activeColors.textMuted }]}>
+              Esta nota no existe o ya ha sido eliminada.
+            </Text>
+
+            <Pressable
+              style={[
+                styles.secondaryButton,
+                { backgroundColor: activeColors.surface },
+              ]}
+              onPress={() => router.replace('/(tabs)/notes')}
+            >
+              <Text
+                style={[
+                  styles.secondaryButtonText,
+                  { color: activeColors.text },
+                ]}
+              >
+                Volver a notas
+              </Text>
+            </Pressable>
+          </View>
+        </ScreenContainer>
       </>
     );
   }
 
   return (
     <>
-      <Stack.Screen options={{ title: note.title }} />
+      <Stack.Screen options={{ headerShown: false }} />
 
-      <ScrollView
-        contentContainerStyle={[
-          styles.container,
-          { backgroundColor: activeColors.background },
-        ]}
-      >
-        <View style={[styles.colorBar, { backgroundColor: note.color }]} />
-
-        <Text style={[styles.title, { color: activeColors.text }]}>
-          {note.title}
-        </Text>
-        <Text style={[styles.description, { color: activeColors.textMuted }]}>
-          {note.content}
-        </Text>
-
-        <View
-          style={[
-            styles.card,
-            {
-              borderColor: activeColors.border,
-              backgroundColor: activeColors.surface,
-            },
-          ]}
+      <ScreenContainer withHorizontalPadding={false}>
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
         >
-          <Text style={[styles.cardLabel, { color: activeColors.textMuted }]}>
-            Creada
-          </Text>
-          <Text style={[styles.cardValue, { color: activeColors.text }]}>
-            {new Date(note.createdAt).toLocaleDateString('es-ES')}
-          </Text>
-        </View>
+          <View style={styles.topBar}>
+            <Pressable onPress={() => router.back()}>
+              <Text style={styles.topBarIcon}>‹</Text>
+            </Pressable>
 
-        <Pressable style={styles.deleteButton} onPress={handleDelete}>
-          <Text style={[styles.deleteButtonText, { color: activeColors.text }]}>
-            Eliminar nota
+            <Text style={[styles.topBarTitle, { color: activeColors.text }]}>
+              Nota
+            </Text>
+
+            <Text style={[styles.topBarIcon, { color: activeColors.textMuted }]}>
+              ⋯
+            </Text>
+          </View>
+
+          <Text style={[styles.title, { color: activeColors.text }]}>
+            {note.title}
           </Text>
-        </Pressable>
-      </ScrollView>
+
+          <View
+            style={[
+              styles.contentCard,
+              {
+                borderColor: activeColors.border,
+                backgroundColor: activeColors.surface,
+              },
+            ]}
+          >
+            <Text style={[styles.description, { color: activeColors.textMuted }]}>
+              {note.content || 'Sin contenido adicional.'}
+            </Text>
+          </View>
+
+          <Text style={[styles.createdText, { color: activeColors.textMuted }]}>
+            Creada el {new Date(note.createdAt).toLocaleDateString('es-ES')}
+          </Text>
+
+          <Pressable style={styles.primaryButton}>
+            <Text style={styles.primaryButtonText}>Editar nota</Text>
+          </Pressable>
+
+          <Pressable style={styles.deleteButton} onPress={handleDelete}>
+            <Text style={styles.deleteButtonText}>Eliminar nota</Text>
+          </Pressable>
+        </ScrollView>
+      </ScreenContainer>
     </>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flexGrow: 1,
-    padding: spacing.lg,
+  scrollContent: {
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing['2xl'],
   },
-  colorBar: {
-    width: 80,
-    height: 6,
-    marginBottom: spacing.md,
-    borderRadius: radius.full,
+  emptyState: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  topBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: spacing.sm,
+    marginBottom: spacing.lg,
+  },
+  topBarIcon: {
+    color: colors.brand.primary,
+    fontSize: 26,
+    fontWeight: '800',
+  },
+  topBarTitle: {
+    fontSize: 14,
+    fontWeight: '800',
   },
   title: {
-    fontSize: 30,
-    fontWeight: '700',
+    fontSize: 24,
+    fontWeight: '800',
+    letterSpacing: -0.4,
+    textAlign: 'center',
   },
   description: {
-    marginTop: spacing.md,
     fontSize: 16,
     lineHeight: 24,
   },
-  card: {
-    marginTop: spacing.lg,
-    padding: spacing.md,
+  contentCard: {
+    minHeight: 180,
+    marginTop: spacing.xl,
+    padding: spacing.lg,
     borderWidth: 1,
-    borderRadius: radius.lg,
+    borderRadius: radius.xl,
+    shadowColor: '#0F766E',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.08,
+    shadowRadius: 18,
+    elevation: 3,
   },
-  cardLabel: {
-    fontSize: 14,
-    fontWeight: '600',
+  createdText: {
+    marginTop: spacing.lg,
+    fontSize: 12,
+    textAlign: 'center',
   },
-  cardValue: {
-    marginTop: spacing.xs,
-    fontSize: 18,
-    fontWeight: '700',
+  primaryButton: {
+    alignItems: 'center',
+    marginTop: spacing.lg,
+    paddingVertical: spacing.md,
+    borderRadius: radius.full,
+    backgroundColor: colors.brand.primary,
+  },
+  primaryButtonText: {
+    color: '#FFFFFF',
+    fontSize: 15,
+    fontWeight: '800',
   },
   deleteButton: {
     alignItems: 'center',
-    marginTop: spacing.xl,
+    marginTop: spacing.md,
     paddingVertical: spacing.md,
-    borderRadius: radius.md,
-    backgroundColor: colors.feedback.error,
+    borderRadius: radius.full,
+    backgroundColor: '#FDE7E4',
   },
   deleteButtonText: {
-    fontSize: 16,
-    fontWeight: '700',
+    color: '#EF4444',
+    fontSize: 14,
+    fontWeight: '800',
   },
   secondaryButton: {
     alignItems: 'center',
     marginTop: spacing.lg,
     paddingVertical: spacing.md,
-    borderRadius: radius.md,
+    borderRadius: radius.full,
   },
   secondaryButtonText: {
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: '800',
   },
 });

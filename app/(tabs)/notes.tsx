@@ -1,10 +1,11 @@
 import { useEffect } from 'react';
 import { router } from 'expo-router';
 import { FlashList } from '@shopify/flash-list';
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { NoteCard } from '@/components/items/NoteCard';
-import { spacing } from '@/constants/theme';
+import { ScreenContainer } from '@/components/layout/ScreenContainer';
+import { colors, radius, spacing } from '@/constants/theme';
 import { useAppTheme } from '@/context/ThemeContext';
 import { useMomentumStore } from '@/store/useMomentumStore';
 
@@ -20,16 +21,13 @@ export default function NotesScreen() {
   }, [fetchNotes]);
 
   return (
-    <View
-      style={[
-        styles.container,
-        { backgroundColor: activeColors.background },
-      ]}
-    >
-      <Text style={[styles.title, { color: activeColors.text }]}>Notas</Text>
-      <Text style={[styles.description, { color: activeColors.textMuted }]}>
-        Guarda ideas rápidas, reflexiones o apuntes personales.
-      </Text>
+    <ScreenContainer>
+      <View style={styles.header}>
+        <Text style={[styles.title, { color: activeColors.text }]}>Notas</Text>
+        <Text style={[styles.description, { color: activeColors.textMuted }]}>
+          Guarda ideas rápidas, reflexiones o apuntes personales.
+        </Text>
+      </View>
 
       {error ? (
         <View
@@ -49,7 +47,7 @@ export default function NotesScreen() {
 
       {isLoading && notes.length === 0 ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator />
+          <ActivityIndicator color={colors.brand.primary} />
           <Text style={[styles.loadingText, { color: activeColors.textMuted }]}>
             Cargando notas...
           </Text>
@@ -97,28 +95,39 @@ export default function NotesScreen() {
           />
         </View>
       )}
-    </View>
+
+      <Pressable
+        style={styles.fab}
+        onPress={() => {
+          router.push('/new-item');
+        }}
+      >
+        <Text style={styles.fabText}>＋</Text>
+      </Pressable>
+    </ScreenContainer>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: spacing.lg,
+  header: {
+    paddingTop: spacing.md,
   },
   title: {
-    fontSize: 28,
-    fontWeight: '700',
+    fontSize: 34,
+    fontWeight: '800',
+    letterSpacing: -0.6,
   },
   description: {
+    maxWidth: 320,
     marginTop: spacing.sm,
     fontSize: 16,
+    lineHeight: 24,
   },
   feedbackContainer: {
     marginTop: spacing.md,
     padding: spacing.md,
     borderWidth: 1,
-    borderRadius: 16,
+    borderRadius: radius.xl,
   },
   feedbackText: {
     fontSize: 14,
@@ -143,11 +152,11 @@ const styles = StyleSheet.create({
   emptyContainer: {
     padding: spacing.lg,
     borderWidth: 1,
-    borderRadius: 16,
+    borderRadius: radius.xl,
   },
   emptyTitle: {
     fontSize: 18,
-    fontWeight: '700',
+    fontWeight: '800',
     textAlign: 'center',
   },
   emptyDescription: {
@@ -155,5 +164,27 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 20,
     textAlign: 'center',
+  },
+  fab: {
+    position: 'absolute',
+    right: spacing.lg,
+    bottom: spacing.xl,
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 58,
+    height: 58,
+    borderRadius: radius.full,
+    backgroundColor: colors.brand.primary,
+    shadowColor: '#0F766E',
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.2,
+    shadowRadius: 18,
+    elevation: 6,
+  },
+  fabText: {
+    color: '#FFFFFF',
+    fontSize: 28,
+    fontWeight: '800',
+    lineHeight: 32,
   },
 });

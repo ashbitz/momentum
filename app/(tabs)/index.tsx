@@ -1,9 +1,52 @@
+import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import {
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { colors, radius, spacing } from '@/constants/theme';
 import { useAppTheme } from '@/context/ThemeContext';
 import { useMomentumStore } from '@/store/useMomentumStore';
+
+type StatCardProps = {
+  icon: string;
+  value: number;
+  label: string;
+};
+
+function StatCard({ icon, value, label }: StatCardProps) {
+  const { colors: activeColors } = useAppTheme();
+
+  return (
+    <View
+      style={[
+        styles.statCard,
+        {
+          borderColor: activeColors.border,
+          backgroundColor: activeColors.surface,
+        },
+      ]}
+    >
+      <View
+        style={[
+          styles.statIconBadge,
+          { backgroundColor: activeColors.surfaceSoft },
+        ]}
+      >
+        <Text style={styles.statIcon}>{icon}</Text>
+      </View>
+
+      <Text style={styles.statValue}>{value}</Text>
+      <Text style={[styles.statLabel, { color: activeColors.textMuted }]}>
+        {label}
+      </Text>
+    </View>
+  );
+}
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -15,152 +58,176 @@ export default function HomeScreen() {
 
   const pendingTasks = tasks.filter((task) => !task.isCompleted).length;
   const completedTasks = tasks.filter((task) => task.isCompleted).length;
-  const trackedHabitDays = habits.reduce(
-    (total, habit) => total + habit.logs.length,
-    0,
-  );
+  const currentStreak = 0;
 
   return (
-    <View
+    <SafeAreaView
       style={[
-        styles.container,
+        styles.safeArea,
         { backgroundColor: activeColors.background },
       ]}
+      edges={['top']}
     >
-      <Text style={styles.kicker}>Momentum</Text>
-      <Text style={[styles.title, { color: activeColors.text }]}>
-        Resumen del día
-      </Text>
-      <Text style={[styles.description, { color: activeColors.textMuted }]}>
-        Consulta de un vistazo tus hábitos, tareas y notas personales.
-      </Text>
-
-      <Pressable
-        style={styles.createButton}
-        onPress={() => {
-          router.push('/new-item');
-        }}
-      >
-        <Text style={[styles.createButtonText, { color: activeColors.text }]}>
-          + Crear nuevo
-        </Text>
-      </Pressable>
-
-      <View style={styles.statsGrid}>
-        <View
-          style={[
-            styles.statCard,
-            {
-              borderColor: activeColors.border,
-              backgroundColor: activeColors.surface,
-            },
-          ]}
-        >
-          <Text style={styles.statValue}>{habits.length}</Text>
-          <Text style={[styles.statLabel, { color: activeColors.textMuted }]}>
-            hábitos activos
-          </Text>
-        </View>
-
-        <View
-          style={[
-            styles.statCard,
-            {
-              borderColor: activeColors.border,
-              backgroundColor: activeColors.surface,
-            },
-          ]}
-        >
-          <Text style={styles.statValue}>{pendingTasks}</Text>
-          <Text style={[styles.statLabel, { color: activeColors.textMuted }]}>
-            tareas pendientes
-          </Text>
-        </View>
-
-        <View
-          style={[
-            styles.statCard,
-            {
-              borderColor: activeColors.border,
-              backgroundColor: activeColors.surface,
-            },
-          ]}
-        >
-          <Text style={styles.statValue}>{notes.length}</Text>
-          <Text style={[styles.statLabel, { color: activeColors.textMuted }]}>
-            notas guardadas
-          </Text>
-        </View>
-
-        <View
-          style={[
-            styles.statCard,
-            {
-              borderColor: activeColors.border,
-              backgroundColor: activeColors.surface,
-            },
-          ]}
-        >
-          <Text style={styles.statValue}>{trackedHabitDays}</Text>
-          <Text style={[styles.statLabel, { color: activeColors.textMuted }]}>
-            registros de hábitos
-          </Text>
-        </View>
-      </View>
-
-      <View
-        style={[
-          styles.summaryCard,
-          {
-            borderColor: activeColors.border,
-            backgroundColor: activeColors.surfaceSoft,
-          },
+      <LinearGradient
+        colors={[
+          activeColors.background,
+          activeColors.surfaceSoft,
+          activeColors.background,
         ]}
+        locations={[0, 0.55, 1]}
+        style={styles.gradient}
       >
-        <Text style={[styles.summaryTitle, { color: activeColors.text }]}>
-          Estado actual
-        </Text>
-        <Text style={[styles.summaryText, { color: activeColors.textMuted }]}>
-          Has completado {completedTasks} tarea
-          {completedTasks === 1 ? '' : 's'} y tienes {pendingTasks} pendiente
-          {pendingTasks === 1 ? '' : 's'}.
-        </Text>
-      </View>
-    </View>
+        <View style={styles.container}>
+          <View style={styles.brandRow}>
+            <Text style={styles.brandText}>Momentum</Text>
+          </View>
+
+          <Text style={[styles.title, { color: activeColors.text }]}>
+            Resumen del día
+          </Text>
+          <Text style={[styles.description, { color: activeColors.textMuted }]}>
+            Consulta de un vistazo tus hábitos, tareas y notas personales.
+          </Text>
+
+          <Pressable
+            style={styles.createButton}
+            onPress={() => {
+              router.push('/new-item');
+            }}
+          >
+            <Text style={styles.createButtonIcon}>＋</Text>
+            <Text style={styles.createButtonText}>Crear nuevo</Text>
+          </Pressable>
+
+          <View style={styles.statsGrid}>
+            <StatCard
+              icon="◼"
+              value={habits.length}
+              label="hábitos activos"
+            />
+            <StatCard
+              icon="✓"
+              value={pendingTasks}
+              label="tareas pendientes"
+            />
+            <StatCard
+              icon="✎"
+              value={notes.length}
+              label="notas guardadas"
+            />
+            <StatCard
+              icon="🔥"
+            value={currentStreak}
+            label="días de racha"
+            />
+          </View>
+
+          <View
+            style={[
+              styles.summaryCard,
+              {
+                borderColor: activeColors.border,
+                backgroundColor: activeColors.surfaceSoft,
+              },
+            ]}
+          >
+            <View style={styles.summaryIconBadge}>
+              <Text
+                style={[
+                  styles.summaryIcon,
+                  { color: activeColors.surfaceSoft },
+                ]}
+              >
+                ★
+              </Text>
+            </View>
+
+            <View style={styles.summaryContent}>
+              <Text style={[styles.summaryTitle, { color: activeColors.text }]}>
+                Estado actual
+              </Text>
+              <Text
+                style={[
+                  styles.summaryText,
+                  { color: activeColors.textMuted },
+                ]}
+              >
+                Has completado {completedTasks} tarea
+                {completedTasks === 1 ? '' : 's'} y tienes {pendingTasks}{' '}
+                pendiente
+                {pendingTasks === 1 ? '' : 's'}.
+              </Text>
+            </View>
+
+            <Text
+              style={[
+                styles.summaryArrow,
+                { color: activeColors.textMuted },
+              ]}
+            >
+              ›
+            </Text>
+          </View>
+        </View>
+      </LinearGradient>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+  },
+  gradient: {
+    flex: 1,
+  },
   container: {
     flex: 1,
-    padding: spacing.lg,
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.lg,
   },
-  kicker: {
-    marginBottom: spacing.sm,
-    color: colors.brand.secondary,
-    fontSize: 16,
-    fontWeight: '600',
+  brandRow: {
+    marginTop: spacing.sm,
+    marginBottom: spacing.xl,
+  },
+  brandText: {
+    color: colors.brand.primary,
+    fontSize: 18,
+    fontWeight: '800',
+    letterSpacing: 0.2,
   },
   title: {
-    fontSize: 32,
-    fontWeight: '700',
+    maxWidth: 280,
+    fontSize: 38,
+    fontWeight: '800',
+    letterSpacing: -0.8,
   },
   description: {
-    marginTop: spacing.sm,
-    fontSize: 16,
-    lineHeight: 24,
+    maxWidth: 310,
+    marginTop: spacing.md,
+    fontSize: 17,
+    lineHeight: 26,
   },
   createButton: {
     alignSelf: 'flex-start',
-    marginTop: spacing.lg,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    marginTop: spacing.xl,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
     borderRadius: radius.full,
     backgroundColor: colors.brand.primary,
   },
-  createButtonText: {
-    fontSize: 15,
+  createButtonIcon: {
+    color: '#FFFFFF',
+    fontSize: 20,
     fontWeight: '700',
+  },
+  createButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '800',
   },
   statsGrid: {
     flexDirection: 'row',
@@ -170,33 +237,80 @@ const styles = StyleSheet.create({
   },
   statCard: {
     width: '47%',
+    minHeight: 128,
+    justifyContent: 'space-between',
     padding: spacing.md,
     borderWidth: 1,
-    borderRadius: radius.lg,
+    borderRadius: radius.xl,
+    shadowColor: '#0F766E',
+    shadowOffset: {
+      width: 0,
+      height: 10,
+    },
+    shadowOpacity: 0.08,
+    shadowRadius: 18,
+    elevation: 3,
+  },
+  statIconBadge: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 38,
+    height: 38,
+    borderRadius: radius.full,
+  },
+  statIcon: {
+    color: colors.brand.primary,
+    fontSize: 18,
+    fontWeight: '800',
   },
   statValue: {
-    color: colors.brand.accent,
-    fontSize: 28,
-    fontWeight: '700',
+    marginTop: spacing.md,
+    color: colors.brand.primary,
+    fontSize: 34,
+    fontWeight: '800',
+    letterSpacing: -0.8,
   },
   statLabel: {
     marginTop: spacing.xs,
-    fontSize: 13,
-    lineHeight: 18,
+    fontSize: 15,
+    lineHeight: 20,
   },
   summaryCard: {
-    marginTop: spacing.lg,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    marginTop: spacing.xl,
     padding: spacing.md,
     borderWidth: 1,
-    borderRadius: radius.lg,
+    borderRadius: radius.xl,
+  },
+  summaryIconBadge: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 62,
+    height: 62,
+    borderRadius: radius.full,
+    backgroundColor: colors.brand.primary,
+  },
+  summaryIcon: {
+    fontSize: 30,
+    fontWeight: '900',
+    lineHeight: 34,
+  },
+  summaryContent: {
+    flex: 1,
   },
   summaryTitle: {
-    fontSize: 18,
-    fontWeight: '700',
+    fontSize: 20,
+    fontWeight: '800',
   },
   summaryText: {
-    marginTop: spacing.sm,
-    fontSize: 14,
-    lineHeight: 20,
+    marginTop: spacing.xs,
+    fontSize: 15,
+    lineHeight: 22,
+  },
+  summaryArrow: {
+    fontSize: 34,
+    fontWeight: '300',
   },
 });

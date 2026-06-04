@@ -8,6 +8,7 @@ type ApiHabitLog = {
   log_date: string;
   value: number;
   is_completed: boolean;
+  color?: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -33,6 +34,7 @@ type ApiTask = {
   priority: string;
   due_date: string | null;
   is_completed: boolean;
+  color?: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -59,6 +61,7 @@ type CreateTaskInput = {
   title: string;
   description?: string;
   isCompleted?: boolean;
+  color?: string;
 };
 
 type CreateNoteInput = {
@@ -79,7 +82,7 @@ function mapHabitFromApi(habit: ApiHabit, logs = [] as ApiHabitLog[]): Habit {
     id: habit.id,
     title: habit.title,
     description: habit.description ?? undefined,
-    color: habit.color ?? '#6366F1',
+    color: habit.color ?? '#14B8A6',
     targetValue: habit.target,
     unit: habit.unit ?? '',
     logs: logs.map(mapHabitLogFromApi),
@@ -93,6 +96,7 @@ function mapTaskFromApi(task: ApiTask): Task {
     id: task.id,
     title: task.title,
     description: task.description ?? undefined,
+    color: task.color ?? undefined,
     isCompleted: task.is_completed,
     createdAt: task.created_at,
     updatedAt: task.updated_at,
@@ -173,6 +177,7 @@ export async function createTask(data: CreateTaskInput): Promise<Task> {
     body: JSON.stringify({
       title: data.title,
       description: data.description,
+      color: data.color,
       is_completed: data.isCompleted ?? false,
       priority: 'medium',
     }),
