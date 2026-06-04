@@ -70,6 +70,15 @@ type CreateNoteInput = {
   color?: string;
 };
 
+type UpdateHabitInput = Partial<CreateHabitInput>;
+
+type CreateHabitLogInput = {
+  date: ISODateString;
+  value?: number;
+};
+type UpdateTaskInput = Partial<CreateTaskInput>;
+type UpdateNoteInput = Partial<CreateNoteInput>;
+
 function mapHabitLogFromApi(log: ApiHabitLog) {
   return {
     date: log.log_date as ISODateString,
@@ -136,7 +145,13 @@ async function request<T>(
 export async function getHabits(): Promise<Habit[]> {
   const habits = await request<ApiHabit[]>('/habits');
 
-  return habits.map((habit) => mapHabitFromApi(habit));
+  return Promise.all(
+    habits.map(async (habit) => {
+      const logs = await request<ApiHabitLog[]>(`/habits/${habit.id}/logs`);
+
+      return mapHabitFromApi(habit, logs);
+    }),
+  );
 }
 
 export async function createHabit(data: CreateHabitInput): Promise<Habit> {
@@ -153,6 +168,46 @@ export async function createHabit(data: CreateHabitInput): Promise<Habit> {
   });
 
   return mapHabitFromApi(habit);
+}
+
+export async function updateHabit(
+  id: string,
+  data: UpdateHabitInput
+): Promise<Habit> {
+  const habit = await request<ApiHabit>(`/habits/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify({
+      title: data.title,
+      description: data.description,
+      color: data.color,
+      target: data.targetValue,
+      unit: data.unit,
+    }),
+  });
+
+  return mapHabitFromApi(habit);
+}
+
+
+export async function getHabitLogs(id: string): Promise<Habit['logs']> {
+  const logs = await request<ApiHabitLog[]>(`/habits/${id}/logs`);
+
+  return logs.map(mapHabitLogFromApi);
+}
+
+export async function addHabitProgress(
+  id: string,
+  data: CreateHabitLogInput
+): Promise<Habit['logs'][number]> {
+  const log = await request<ApiHabitLog>(`/habits/${id}/logs`, {
+    method: 'POST',
+    body: JSON.stringify({
+      log_date: data.date,
+      value: data.value ?? 1,
+    }),
+  });
+
+  return mapHabitLogFromApi(log);
 }
 
 export async function deleteHabit(id: string): Promise<void> {
@@ -180,6 +235,23 @@ export async function createTask(data: CreateTaskInput): Promise<Task> {
       color: data.color,
       is_completed: data.isCompleted ?? false,
       priority: 'medium',
+    }),
+  });
+
+  return mapTaskFromApi(task);
+}
+
+export async function updateTask(
+  id: string,
+  data: UpdateTaskInput
+): Promise<Task> {
+  const task = await request<ApiTask>(`/tasks/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify({
+      title: data.title,
+      description: data.description,
+      color: data.color,
+      is_completed: data.isCompleted,
     }),
   });
 
@@ -224,6 +296,22 @@ export async function createNote(data: CreateNoteInput): Promise<Note> {
       content: data.content,
       color: data.color,
       is_pinned: false,
+    }),
+  });
+
+  return mapNoteFromApi(note);
+}
+
+export async function updateNote(
+  id: string,
+  data: UpdateNoteInput
+): Promise<Note> {
+  const note = await request<ApiNote>(`/notes/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify({
+      title: data.title,
+      content: data.content,
+      color: data.color,
     }),
   });
 

@@ -11,10 +11,140 @@ interface HabitCardProps {
 
 const HEATMAP_CELLS = 112;
 
+function toLocalISODate(date: Date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+
+  return `${year}-${month}-${day}`;
+}
+
+function getLastDates(totalDays: number) {
+  const today = new Date();
+
+  return Array.from({ length: totalDays }).map((_, index) => {
+    const date = new Date(today);
+    date.setDate(today.getDate() - (totalDays - 1 - index));
+
+    return toLocalISODate(date);
+  });
+}
+
+function normalizeHexColor(hexColor: string) {
+  const normalizedHex = hexColor.replace('#', '');
+
+  if (normalizedHex.length !== 6) {
+    return null;
+  }
+
+  return {
+    red: parseInt(normalizedHex.slice(0, 2), 16),
+    green: parseInt(normalizedHex.slice(2, 4), 16),
+    blue: parseInt(normalizedHex.slice(4, 6), 16),
+  };
+}
+
+function rgbToHex(red: number, green: number, blue: number) {
+  const toHex = (value: number) =>
+    Math.max(0, Math.min(255, Math.round(value)))
+      .toString(16)
+      .padStart(2, '0');
+
+  return `#${toHex(red)}${toHex(green)}${toHex(blue)}`;
+}
+
+function mixHexColors(hexColor: string, baseColor: string, colorWeight: number) {
+  const rgbColor = normalizeHexColor(hexColor);
+  const rgbBase = normalizeHexColor(baseColor);
+
+  if (!rgbColor || !rgbBase) {
+    return hexColor;
+  }
+
+  const baseWeight = 1 - colorWeight;
+
+  return rgbToHex(
+    rgbColor.red * colorWeight + rgbBase.red * baseWeight,
+    rgbColor.green * colorWeight + rgbBase.green * baseWeight,
+    rgbColor.blue * colorWeight + rgbBase.blue * baseWeight,
+  );
+}
+
+function mixWithWhite(hexColor: string, colorWeight: number) {
+  return mixHexColors(hexColor, '#FFFFFF', colorWeight);
+}
+
+function darkenHexColor(hexColor: string, amount: number) {
+  const rgbColor = normalizeHexColor(hexColor);
+
+  if (!rgbColor) {
+    return hexColor;
+  }
+
+  return rgbToHex(
+    rgbColor.red * amount,
+    rgbColor.green * amount,
+    rgbColor.blue * amount,
+  );
+}
+
+function getHeatmapColor(
+  value: number,
+  targetValue: number,
+  habitColor: string,
+  emptyBaseColor: string,
+) {
+  const safeTarget = Math.max(targetValue, 1);
+  const ratio = value / safeTarget;
+
+  if (ratio <= 0) {
+    return mixHexColors(habitColor, emptyBaseColor, 0.08);
+  }
+
+  if (ratio < 0.5) {
+    return mixWithWhite(habitColor, 0.38);
+  }
+
+  if (ratio < 1) {
+    return mixWithWhite(habitColor, 0.7);
+  }
+
+  if (ratio < 1.5) {
+    return habitColor;
+  }
+
+  return darkenHexColor(habitColor, 0.72);
+}
+
+function getCurrentStreak(habit: Habit) {
+  const completedDates = new Set(
+    habit.logs
+      .filter((log) => log.value >= habit.targetValue)
+      .map((log) => log.date),
+  );
+  const today = new Date();
+  let streak = 0;
+
+  for (let offset = 0; offset < HEATMAP_CELLS; offset += 1) {
+    const date = new Date(today);
+    date.setDate(today.getDate() - offset);
+
+    if (!completedDates.has(toLocalISODate(date))) {
+      break;
+    }
+
+    streak += 1;
+  }
+
+  return streak;
+}
+
 export function HabitCard({ habit, onPress }: HabitCardProps) {
   const { colors: activeColors } = useAppTheme();
-  const streak = 0;
+  const streak = getCurrentStreak(habit);
   const habitColor = habit.color || colors.brand.primary;
+  const logsByDate = new Map(habit.logs.map((log) => [log.date, log.value]));
+  const heatmapDates = getLastDates(HEATMAP_CELLS);
 
   return (
     <Pressable
@@ -29,9 +159,7 @@ export function HabitCard({ habit, onPress }: HabitCardProps) {
     >
       <View style={styles.headerRow}>
         <View style={styles.titleContent}>
-          <Text style={[styles.cardTitle, { color: activeColors.text }]}>
-            {habit.title}
-          </Text>
+          <Text style={[styles.cardTitle, { color: activeColors.text }]}>{habit.title}</Text>
 
           {habit.description ? (
             <Text
@@ -52,9 +180,7 @@ export function HabitCard({ habit, onPress }: HabitCardProps) {
             { backgroundColor: streak > 0 ? `${habitColor}1F` : activeColors.surfaceSoft },
           ]}
         >
-          <Text style={[styles.streakIcon, { opacity: streak > 0 ? 1 : 0.45 }]}>
-            🔥
-          </Text>
+          <Text style={[styles.streakIcon, { opacity: streak > 0 ? 1 : 0.45 }]}>🔥</Text>
           <Text
             style={[
               styles.streakText,
@@ -67,21 +193,21 @@ export function HabitCard({ habit, onPress }: HabitCardProps) {
       </View>
 
       <View style={styles.heatmap}>
-        {Array.from({ length: HEATMAP_CELLS }).map((_, index) => {
-          const isActive = index % 9 === 0 || index % 17 === 0;
-          const isStrong = index % 23 === 0;
+        {heatmapDates.map((date) => {
+          const value = logsByDate.get(date) ?? 0;
 
           return (
             <View
-              key={index}
+              key={date}
               style={[
                 styles.heatmapCell,
                 {
-                  backgroundColor: isStrong
-                    ? habitColor
-                    : isActive
-                      ? `${habitColor}88`
-                      : `${habitColor}18`,
+                  backgroundColor: getHeatmapColor(
+                    value,
+                    habit.targetValue,
+                    habitColor,
+                    activeColors.surfaceSoft,
+                  ),
                 },
               ]}
             />

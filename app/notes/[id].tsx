@@ -23,6 +23,21 @@ export default function NoteDetailScreen() {
   );
   const deleteNote = useMomentumStore((state) => state.deleteNote);
 
+
+  const handleEdit = () => {
+    if (!note) {
+      return;
+    }
+
+    router.push({
+      pathname: '/new-item',
+      params: {
+        type: 'note',
+        id: note.id,
+      },
+    });
+  };
+
   const handleConfirmDelete = async () => {
     if (!note) {
       return;
@@ -103,7 +118,7 @@ export default function NoteDetailScreen() {
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.topBar}>
-            <Pressable onPress={() => router.back()}>
+            <Pressable hitSlop={16} onPress={() => router.back()}>
               <Text style={styles.topBarIcon}>‹</Text>
             </Pressable>
 
@@ -111,9 +126,11 @@ export default function NoteDetailScreen() {
               Nota
             </Text>
 
-            <Text style={[styles.topBarIcon, { color: activeColors.textMuted }]}>
-              ⋯
-            </Text>
+            <Pressable hitSlop={16} onPress={handleEdit}>
+              <Text style={[styles.topBarIcon, { color: activeColors.textMuted }]}>
+                ⋯
+              </Text>
+            </Pressable>
           </View>
 
           <Text style={[styles.title, { color: activeColors.text }]}>
@@ -138,7 +155,7 @@ export default function NoteDetailScreen() {
             Creada el {new Date(note.createdAt).toLocaleDateString('es-ES')}
           </Text>
 
-          <Pressable style={styles.primaryButton}>
+          <Pressable style={styles.primaryButton} onPress={handleEdit}>
             <Text style={styles.primaryButtonText}>Editar nota</Text>
           </Pressable>
 

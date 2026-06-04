@@ -1,18 +1,23 @@
 import { create } from 'zustand';
 
 import {
+  addHabitProgress,
   createHabit,
   createNote,
   createTask,
   deleteHabit,
   deleteNote,
   deleteTask,
+  getHabitLogs,
   getHabits,
   getNotes,
   getTasks,
+  updateHabit,
+  updateNote,
+  updateTask,
   updateTaskStatus,
 } from '@/lib/api';
-import type { Habit, Note, Task } from '@/types';
+import type { Habit, HabitLog, ISODateString, Note, Task } from '@/types';
 
 interface MomentumStore {
   habits: Habit[];
@@ -22,12 +27,19 @@ interface MomentumStore {
   error: string | null;
 
   fetchHabits: () => Promise<void>;
+  fetchHabitLogs: (id: string) => Promise<void>;
   fetchTasks: () => Promise<void>;
   fetchNotes: () => Promise<void>;
 
   addHabit: (habit: Habit) => Promise<void>;
   addTask: (task: Task) => Promise<void>;
   addNote: (note: Note) => Promise<void>;
+
+  updateHabit: (id: string, habit: Habit) => Promise<void>;
+  updateTask: (id: string, task: Task) => Promise<void>;
+  updateNote: (id: string, note: Note) => Promise<void>;
+
+  addHabitProgress: (id: string, date: ISODateString, value?: number) => Promise<void>;
 
   deleteHabit: (id: string) => Promise<void>;
   deleteTask: (id: string) => Promise<void>;
@@ -56,6 +68,31 @@ export const useMomentumStore = create<MomentumStore>()((set, get) => ({
     } catch {
       set({
         error: 'No se han podido cargar los hábitos.',
+        isLoading: false,
+      });
+    }
+  },
+
+  fetchHabitLogs: async (id) => {
+    set({ isLoading: true, error: null });
+
+    try {
+      const logs = await getHabitLogs(id);
+
+      set((state) => ({
+        habits: state.habits.map((habit) =>
+          habit.id === id
+            ? {
+                ...habit,
+                logs,
+              }
+            : habit,
+        ),
+        isLoading: false,
+      }));
+    } catch {
+      set({
+        error: 'No se han podido cargar los registros del hábito.',
         isLoading: false,
       });
     }
@@ -128,17 +165,12 @@ export const useMomentumStore = create<MomentumStore>()((set, get) => ({
       const createdTask = await createTask({
         title: task.title,
         description: task.description,
+        color: task.color,
         isCompleted: task.isCompleted,
       });
 
       set((state) => ({
-        tasks: [
-          ...state.tasks,
-          {
-            ...createdTask,
-            color: task.color,
-          },
-        ],
+        tasks: [...state.tasks, createdTask],
         isLoading: false,
       }));
     } catch {
@@ -166,6 +198,120 @@ export const useMomentumStore = create<MomentumStore>()((set, get) => ({
     } catch {
       set({
         error: 'No se ha podido crear la nota.',
+        isLoading: false,
+      });
+    }
+  },
+
+
+  updateHabit: async (id, habit) => {
+    set({ isLoading: true, error: null });
+
+    try {
+      const updatedHabit = await updateHabit(id, {
+        title: habit.title,
+        description: habit.description,
+        color: habit.color,
+        targetValue: habit.targetValue,
+        unit: habit.unit,
+      });
+
+      set((state) => ({
+        habits: state.habits.map((currentHabit) =>
+          currentHabit.id === id ? updatedHabit : currentHabit,
+        ),
+        isLoading: false,
+      }));
+    } catch {
+      set({
+        error: 'No se ha podido actualizar el hábito.',
+        isLoading: false,
+      });
+    }
+  },
+
+  updateTask: async (id, task) => {
+    set({ isLoading: true, error: null });
+
+    try {
+      const updatedTask = await updateTask(id, {
+        title: task.title,
+        description: task.description,
+        color: task.color,
+        isCompleted: task.isCompleted,
+      });
+
+      set((state) => ({
+        tasks: state.tasks.map((currentTask) =>
+          currentTask.id === id ? updatedTask : currentTask,
+        ),
+        isLoading: false,
+      }));
+    } catch {
+      set({
+        error: 'No se ha podido actualizar la tarea.',
+        isLoading: false,
+      });
+    }
+  },
+
+  updateNote: async (id, note) => {
+    set({ isLoading: true, error: null });
+
+    try {
+      const updatedNote = await updateNote(id, {
+        title: note.title,
+        content: note.content,
+        color: note.color,
+      });
+
+      set((state) => ({
+        notes: state.notes.map((currentNote) =>
+          currentNote.id === id ? updatedNote : currentNote,
+        ),
+        isLoading: false,
+      }));
+    } catch {
+      set({
+        error: 'No se ha podido actualizar la nota.',
+        isLoading: false,
+      });
+    }
+  },
+
+
+
+  addHabitProgress: async (id, date, value = 1) => {
+    set({ isLoading: true, error: null });
+
+    try {
+      const updatedLog = await addHabitProgress(id, { date, value });
+
+      set((state) => ({
+        habits: state.habits.map((habit) => {
+          if (habit.id !== id) {
+            return habit;
+          }
+
+          const logExists = habit.logs.some((log) => log.date === updatedLog.date);
+          const logs: HabitLog[] = logExists
+            ? habit.logs.map((log) =>
+                log.date === updatedLog.date ? updatedLog : log,
+              )
+            : [...habit.logs, updatedLog];
+
+          return {
+            ...habit,
+            logs: logs.sort((firstLog, secondLog) =>
+              firstLog.date.localeCompare(secondLog.date),
+            ),
+          };
+        }),
+        isLoading: false,
+      }));
+    } catch {
+      set({
+        error: 'No se ha podido registrar el progreso del hábito.',
         isLoading: false,
       });
     }
@@ -240,10 +386,7 @@ export const useMomentumStore = create<MomentumStore>()((set, get) => ({
       set((state) => ({
         tasks: state.tasks.map((currentTask) =>
           currentTask.id === id
-            ? {
-                ...updatedTask,
-                color: currentTask.color,
-              }
+            ? updatedTask
             : currentTask,
         ),
         isLoading: false,

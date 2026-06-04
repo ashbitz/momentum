@@ -24,6 +24,21 @@ export default function TaskDetailScreen() {
   const deleteTask = useMomentumStore((state) => state.deleteTask);
   const toggleTask = useMomentumStore((state) => state.toggleTask);
 
+
+  const handleEdit = () => {
+    if (!task) {
+      return;
+    }
+
+    router.push({
+      pathname: '/new-item',
+      params: {
+        type: 'task',
+        id: task.id,
+      },
+    });
+  };
+
   const handleToggle = async () => {
     if (!task) {
       return;
@@ -113,7 +128,7 @@ export default function TaskDetailScreen() {
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.topBar}>
-            <Pressable onPress={() => router.back()}>
+            <Pressable hitSlop={16} onPress={() => router.back()}>
               <Text style={styles.topBarIcon}>‹</Text>
             </Pressable>
 
@@ -121,9 +136,11 @@ export default function TaskDetailScreen() {
               Tarea
             </Text>
 
-            <Text style={[styles.topBarIcon, { color: activeColors.textMuted }]}>
-              ⋯
-            </Text>
+            <Pressable hitSlop={16} onPress={handleEdit}>
+              <Text style={[styles.topBarIcon, { color: activeColors.textMuted }]}>
+                ⋯
+              </Text>
+            </Pressable>
           </View>
 
           <Text style={[styles.title, { color: activeColors.text }]}>
@@ -222,6 +239,10 @@ export default function TaskDetailScreen() {
           <Text style={[styles.createdText, { color: activeColors.textMuted }]}>
             Creada el {new Date(task.createdAt).toLocaleDateString('es-ES')}
           </Text>
+
+          <Pressable style={styles.secondaryActionButton} onPress={handleEdit}>
+            <Text style={styles.secondaryActionButtonText}>Editar tarea</Text>
+          </Pressable>
 
           <Pressable
             style={styles.primaryButton}
@@ -402,9 +423,21 @@ const styles = StyleSheet.create({
     fontSize: 12,
     textAlign: 'center',
   },
-  primaryButton: {
+  secondaryActionButton: {
     alignItems: 'center',
     marginTop: spacing.lg,
+    paddingVertical: spacing.md,
+    borderRadius: radius.full,
+    backgroundColor: colors.brand.primary,
+  },
+  secondaryActionButtonText: {
+    color: '#FFFFFF',
+    fontSize: 15,
+    fontWeight: '800',
+  },
+  primaryButton: {
+    alignItems: 'center',
+    marginTop: spacing.md,
     paddingVertical: spacing.md,
     borderRadius: radius.full,
     backgroundColor: colors.brand.primary,
