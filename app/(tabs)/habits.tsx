@@ -5,7 +5,7 @@ import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-nati
 
 import { HabitCard } from '@/components/items/HabitCard';
 import { ScreenContainer } from '@/components/layout/ScreenContainer';
-import { colors, radius, spacing } from '@/constants/theme';
+import { colors, radius, spacing, typography } from '@/constants/theme';
 import { useAppTheme } from '@/context/ThemeContext';
 import { useMomentumStore } from '@/store/useMomentumStore';
 
@@ -113,15 +113,12 @@ const styles = StyleSheet.create({
     paddingTop: spacing.md,
   },
   title: {
-    fontSize: 34,
-    fontWeight: '800',
-    letterSpacing: -0.6,
+    ...typography.openingTitle,
   },
   description: {
     maxWidth: 320,
     marginTop: spacing.sm,
-    fontSize: 16,
-    lineHeight: 24,
+    ...typography.openingDescription,
   },
   feedbackContainer: {
     marginTop: spacing.md,

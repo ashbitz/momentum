@@ -1,7 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { ScreenContainer } from '@/components/layout/ScreenContainer';
-import { colors, radius, spacing } from '@/constants/theme';
+import { colors, radius, spacing, typography } from '@/constants/theme';
 import { useAppTheme } from '@/context/ThemeContext';
 
 export default function MoreScreen() {
@@ -50,15 +50,12 @@ const styles = StyleSheet.create({
     paddingTop: spacing.md,
   },
   title: {
-    fontSize: 34,
-    fontWeight: '800',
-    letterSpacing: -0.6,
+    ...typography.openingTitle,
   },
   description: {
     maxWidth: 320,
     marginTop: spacing.sm,
-    fontSize: 16,
-    lineHeight: 24,
+    ...typography.openingDescription,
   },
   card: {
     marginTop: spacing.xl,

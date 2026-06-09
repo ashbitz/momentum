@@ -6,11 +6,41 @@ import {
   Text,
   View,
 } from 'react-native';
+import Svg, { Path } from 'react-native-svg';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { colors, radius, spacing } from '@/constants/theme';
+import { colors, radius, spacing, typography } from '@/constants/theme';
 import { useAppTheme } from '@/context/ThemeContext';
 import { useMomentumStore } from '@/store/useMomentumStore';
+
+
+function MomentumLogo() {
+  return (
+    <View style={styles.logoWrapper}>
+      <Svg width={58} height={34} viewBox="0 0 58 34" fill="none">
+        <Path
+          d="M7 27L19 7"
+          stroke={colors.brand.primary}
+          strokeWidth={7}
+          strokeLinecap="round"
+        />
+        <Path
+          d="M24 27L36 7"
+          stroke={colors.brand.accent}
+          strokeWidth={7}
+          strokeLinecap="round"
+          opacity={0.78}
+        />
+        <Path
+          d="M41 27L53 7"
+          stroke={colors.brand.primary}
+          strokeWidth={7}
+          strokeLinecap="round"
+        />
+      </Svg>
+    </View>
+  );
+}
 
 type StatCardProps = {
   icon: string;
@@ -79,6 +109,7 @@ export default function HomeScreen() {
       >
         <View style={styles.container}>
           <View style={styles.brandRow}>
+            <MomentumLogo />
             <Text style={styles.brandText}>Momentum</Text>
           </View>
 
@@ -187,8 +218,17 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.lg,
   },
   brandRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
     marginTop: spacing.sm,
     marginBottom: spacing.xl,
+  },
+  logoWrapper: {
+    width: 58,
+    height: 34,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   brandText: {
     color: colors.brand.primary,
@@ -197,16 +237,13 @@ const styles = StyleSheet.create({
     letterSpacing: 0.2,
   },
   title: {
-    maxWidth: 280,
-    fontSize: 38,
-    fontWeight: '800',
-    letterSpacing: -0.8,
+    maxWidth: 300,
+    ...typography.openingTitle,
   },
   description: {
     maxWidth: 310,
     marginTop: spacing.md,
-    fontSize: 17,
-    lineHeight: 26,
+    ...typography.openingDescription,
   },
   createButton: {
     alignSelf: 'flex-start',

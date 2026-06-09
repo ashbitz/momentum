@@ -82,10 +82,25 @@ export const fontWeight = {
   bold: '700',
 } as const;
 
+export const typography = {
+  openingTitle: {
+    fontSize: 40,
+    fontWeight: '900',
+    lineHeight: 44,
+    letterSpacing: -1,
+  },
+  openingDescription: {
+    fontSize: 16,
+    lineHeight: 23,
+    fontWeight: '500',
+  },
+} as const;
+
 export const theme = {
   colors,
   spacing,
   radius,
   fontSize,
   fontWeight,
+  typography,
 } as const;
