@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "668941089227",
+    "project_id": "momentum-ashbitz",
+    "storage_bucket": "momentum-ashbitz.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:668941089227:android:8abc3b06ef84d211ef1e4e",
+        "android_client_info": {
+          "package_name": "com.ashbitz.momentum"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBGv8jugCSgQlCJKBO-R3jZzTJlP6M84zQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
