@@ -1,6 +1,15 @@
+import auth from '@react-native-firebase/auth';
+
 import type { Habit, ISODateString, Note, Task } from '@/types';
 
-const API_BASE_URL = 'https://momentum-api-ten.vercel.app/api';
+declare const process: {
+  env: {
+    EXPO_PUBLIC_API_URL?: string;
+  };
+};
+
+const API_BASE_URL =
+  process.env.EXPO_PUBLIC_API_URL ?? 'https://momentum-api-ten.vercel.app/api';
 
 type ApiHabitLog = {
   id: string;
@@ -76,7 +85,9 @@ type CreateHabitLogInput = {
   date: ISODateString;
   value?: number;
 };
+
 type UpdateTaskInput = Partial<CreateTaskInput>;
+
 type UpdateNoteInput = Partial<CreateNoteInput>;
 
 function mapHabitLogFromApi(log: ApiHabitLog) {
@@ -123,14 +134,28 @@ function mapNoteFromApi(note: ApiNote): Note {
   };
 }
 
-async function request<T>(
-  path: string,
-  options?: RequestInit
-): Promise<T> {
+async function getAuthorizationHeader() {
+  const currentUser = auth().currentUser;
+
+  if (!currentUser) {
+    throw new Error('Debes iniciar sesión para usar la API de Momentum');
+  }
+
+  const token = await currentUser.getIdToken();
+
+  return {
+    Authorization: `Bearer ${token}`,
+  };
+}
+
+async function request<T>(path: string, options?: RequestInit): Promise<T> {
+  const authHeader = await getAuthorizationHeader();
+
   const response = await fetch(`${API_BASE_URL}${path}`, {
     ...options,
     headers: {
       'Content-Type': 'application/json',
+      ...authHeader,
       ...options?.headers,
     },
   });
@@ -172,7 +197,7 @@ export async function createHabit(data: CreateHabitInput): Promise<Habit> {
 
 export async function updateHabit(
   id: string,
-  data: UpdateHabitInput
+  data: UpdateHabitInput,
 ): Promise<Habit> {
   const habit = await request<ApiHabit>(`/habits/${id}`, {
     method: 'PATCH',
@@ -188,7 +213,6 @@ export async function updateHabit(
   return mapHabitFromApi(habit);
 }
 
-
 export async function getHabitLogs(id: string): Promise<Habit['logs']> {
   const logs = await request<ApiHabitLog[]>(`/habits/${id}/logs`);
 
@@ -197,7 +221,7 @@ export async function getHabitLogs(id: string): Promise<Habit['logs']> {
 
 export async function addHabitProgress(
   id: string,
-  data: CreateHabitLogInput
+  data: CreateHabitLogInput,
 ): Promise<Habit['logs'][number]> {
   const log = await request<ApiHabitLog>(`/habits/${id}/logs`, {
     method: 'POST',
@@ -211,13 +235,9 @@ export async function addHabitProgress(
 }
 
 export async function deleteHabit(id: string): Promise<void> {
-  const response = await fetch(`${API_BASE_URL}/habits/${id}`, {
+  await request<{ success: boolean }>(`/habits/${id}`, {
     method: 'DELETE',
   });
-
-  if (!response.ok) {
-    throw new Error('Error al eliminar el hábito');
-  }
 }
 
 export async function getTasks(): Promise<Task[]> {
@@ -243,7 +263,7 @@ export async function createTask(data: CreateTaskInput): Promise<Task> {
 
 export async function updateTask(
   id: string,
-  data: UpdateTaskInput
+  data: UpdateTaskInput,
 ): Promise<Task> {
   const task = await request<ApiTask>(`/tasks/${id}`, {
     method: 'PATCH',
@@ -260,7 +280,7 @@ export async function updateTask(
 
 export async function updateTaskStatus(
   id: string,
-  isCompleted: boolean
+  isCompleted: boolean,
 ): Promise<Task> {
   const task = await request<ApiTask>(`/tasks/${id}`, {
     method: 'PATCH',
@@ -273,13 +293,9 @@ export async function updateTaskStatus(
 }
 
 export async function deleteTask(id: string): Promise<void> {
-  const response = await fetch(`${API_BASE_URL}/tasks/${id}`, {
+  await request<{ success: boolean }>(`/tasks/${id}`, {
     method: 'DELETE',
   });
-
-  if (!response.ok) {
-    throw new Error('Error al eliminar la tarea');
-  }
 }
 
 export async function getNotes(): Promise<Note[]> {
@@ -304,7 +320,7 @@ export async function createNote(data: CreateNoteInput): Promise<Note> {
 
 export async function updateNote(
   id: string,
-  data: UpdateNoteInput
+  data: UpdateNoteInput,
 ): Promise<Note> {
   const note = await request<ApiNote>(`/notes/${id}`, {
     method: 'PATCH',
@@ -319,11 +335,7 @@ export async function updateNote(
 }
 
 export async function deleteNote(id: string): Promise<void> {
-  const response = await fetch(`${API_BASE_URL}/notes/${id}`, {
+  await request<{ success: boolean }>(`/notes/${id}`, {
     method: 'DELETE',
   });
-
-  if (!response.ok) {
-    throw new Error('Error al eliminar la nota');
-  }
 }
